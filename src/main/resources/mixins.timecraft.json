@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "sn2.timecraft.mixin",
+  "refmap": "mixins.timecraft.refmap.json",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+  ],
+  "client": [
+	"MixinClientPlayerEntity",
+	"MixinCraftingScreen",
+	"MixinInventoryScreen"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

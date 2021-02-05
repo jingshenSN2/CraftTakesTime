@@ -1,0 +1,16 @@
+[
+{
+  "modid": "timecraft",
+  "name": "Craft Time",
+  "description": "Time to craft!",
+  "version": "0.3.2",
+  "mcversion": "${mcversion}",
+  "url": "https://www.curseforge.com/minecraft/mc-mods/craft-time",
+  "updateUrl": "https://raw.githubusercontent.com/jingshenSN2/CraftTime/1.16-forge/update.json",
+  "authorList": ["SN2"],
+  "credits": "",
+  "logoFile": "icon.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
