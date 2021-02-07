@@ -84,4 +84,9 @@ public abstract class MixinCraftingScreen extends GuiContainer implements IRecip
 			info.cancel();
 		}
 	}
+	
+	@Inject(method = "onGuiClosed", at = @At("HEAD"), cancellable = true)
+	public void timecraft$onClose(CallbackInfo info) {
+		player.stopCraft();
+	}
 }
