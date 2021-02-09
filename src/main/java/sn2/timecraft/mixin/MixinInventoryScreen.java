@@ -79,6 +79,8 @@ public abstract class MixinInventoryScreen extends InventoryEffectRenderer imple
 	
 	@Inject(method = "onGuiClosed", at = @At("HEAD"), cancellable = true)
 	public void timecraft$onClose(CallbackInfo info) {
-		player.stopCraft();
+		if (player != null) {			
+			player.stopCraft();
+		}
 	}
 }
