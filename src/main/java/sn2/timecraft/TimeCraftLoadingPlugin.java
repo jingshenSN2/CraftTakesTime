@@ -1,4 +1,4 @@
-package sn2.timecraft.core;
+package sn2.timecraft;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -12,23 +12,20 @@ import org.spongepowered.asm.mixin.Mixins;
 import net.minecraftforge.fml.relauncher.CoreModManager;
 import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin;
 
-public class CoreMod implements IFMLLoadingPlugin {
+public class TimeCraftLoadingPlugin implements IFMLLoadingPlugin {
 
-	public CoreMod() {
+	public TimeCraftLoadingPlugin() {
 		MixinBootstrap.init();
 		Mixins.addConfiguration("mixins.timecraft.json");
 
-		CodeSource codeSource = this.getClass().getProtectionDomain().getCodeSource();
-		if (codeSource != null) {
-			URL location = codeSource.getLocation();
-			try {
-				File file = new File(location.toURI());
-				if (file.isFile()) {
-					CoreModManager.getReparseableCoremods().remove(file.getName());
-				}
-			} catch (URISyntaxException ignored) {
-			}
-		}
+		/*
+		 * CodeSource codeSource =
+		 * this.getClass().getProtectionDomain().getCodeSource(); if (codeSource !=
+		 * null) { URL location = codeSource.getLocation(); try { File file = new
+		 * File(location.toURI()); if (file.isFile()) {
+		 * CoreModManager.getReparseableCoremods().remove(file.getName()); } } catch
+		 * (URISyntaxException ignored) { } }
+		 */
 	}
 
 	@Override
