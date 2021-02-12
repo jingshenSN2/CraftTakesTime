@@ -17,7 +17,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '0.3.2'
+version = '0.3.3'
 group = 'sn2.timecraft' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "CraftTime-FORGE-1.12.2"
 
@@ -116,7 +116,6 @@ jar {
         attributes([
         	"FMLCorePlugin": "sn2.timecraft.core.CoreMod",
         	"FMLCorePluginContainsFMLMod": "true",
-        	"ForceLoadAsMod": "true",
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
             'TweakOrder': 0,
             'MixinConfigs': 'mixins.timecraft.json',
