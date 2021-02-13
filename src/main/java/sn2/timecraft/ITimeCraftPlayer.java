@@ -8,17 +8,17 @@ public interface ITimeCraftPlayer {
 
 	public boolean isCrafting();
 
-	public void setCraftTime(int craft_time);
+	public void setCraftTime(float craft_time);
 
-	public int getCraftTime();
+	public float getCraftTime();
 
-	public void setCraftPeriod(int craft_period);
+	public void setCraftPeriod(float craft_period);
 
-	public int getCraftPeriod();
+	public float getCraftPeriod();
 	
 	public void stopCraft();
 	
-	public void startCraftWithNewPeriod(int craft_period);
+	public void startCraftWithNewPeriod(float craft_period);
 
 	public boolean tick(ItemStack resultStack);
 

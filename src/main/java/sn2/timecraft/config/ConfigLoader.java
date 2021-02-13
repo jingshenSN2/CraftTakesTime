@@ -15,8 +15,12 @@ import sn2.timecraft.Constants;
 
 public class ConfigLoader {
 
-	public HashMap<Integer, Integer> difficultyMap = new HashMap<>();
+	public HashMap<Integer, Float> difficultyMap = new HashMap<>();
 	public static Path cfgPath = Loader.instance().getConfigDir().toPath();
+	public static String GLOBAL = "global_multiplier";
+	public static String MODS = "mods";
+	public static String MOD_MULTIPLIER = "mod_multiplier";
+	public static String ITEMS = "items";
 
 	public ConfigLoader() {
 	}
@@ -30,12 +34,18 @@ public class ConfigLoader {
 				JsonObject array = new JsonObject();
 				nameSpaceMap.put(namespace, array);
 			}
-			nameSpaceMap.get(namespace).addProperty(path, 20);
+			nameSpaceMap.get(namespace).addProperty(path, 20F);
 		});
 
 		JsonObject all = new JsonObject();
+		all.addProperty(GLOBAL, 1F);
+		JsonObject mod_list = new JsonObject();
+		all.add(MODS, mod_list);
 		nameSpaceMap.forEach((name, array) -> {
-			all.add(name, array);
+			JsonObject mod = new JsonObject();
+			mod.addProperty(MOD_MULTIPLIER, 1F);
+			mod.add(ITEMS, array);
+			mod_list.add(name, mod);
 		});
 
 		try {
@@ -54,27 +64,31 @@ public class ConfigLoader {
 	public void parserFrom(String jsonString) {
 		JsonParser parser = new JsonParser();
 		JsonObject object = (JsonObject) parser.parse(jsonString);
-		object.entrySet().forEach(e -> {
+		float global_multiplier = object.getAsJsonPrimitive(GLOBAL).getAsFloat();
+		JsonObject mod_list = object.getAsJsonObject(MODS);
+		mod_list.entrySet().forEach(e -> {
 			String namespace = e.getKey() + ':';
-			JsonObject paths = (JsonObject) e.getValue();
-			paths.entrySet().forEach(p -> {
-				String item = namespace + p.getKey();
+			JsonObject mod = (JsonObject) e.getValue();
+			float mod_multiplier = mod.getAsJsonPrimitive(MOD_MULTIPLIER).getAsFloat() * global_multiplier;
+			JsonObject items = mod.getAsJsonObject(ITEMS);
+			items.entrySet().forEach(i -> {
+				String item = namespace + i.getKey();
 				int id = Item.getIdFromItem(Item.getByNameOrId(item));
-				int value = p.getValue().getAsInt();
+				float value = i.getValue().getAsFloat() * mod_multiplier;
 				this.setDifficulty(id, value);
 			});
 		});
 	}
 
-	public int getDifficulty(Item item) {
+	public float getDifficulty(Item item) {
 		int rkey = Item.getIdFromItem(item);
 		if (difficultyMap.containsKey(rkey)) {
 			return difficultyMap.get(rkey);
 		}
-		return 20;
+		return 20F;
 	}
 
-	public void setDifficulty(int item, int difficulty) {
+	public void setDifficulty(int item, float difficulty) {
 		this.difficultyMap.put(item, difficulty);
 	}
 }

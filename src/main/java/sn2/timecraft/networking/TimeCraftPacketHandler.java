@@ -9,7 +9,7 @@ public class TimeCraftPacketHandler {
 
 	private static int packetId = 0;
 	public static SimpleNetworkWrapper INSTANCE = NetworkRegistry.INSTANCE
-			.newSimpleChannel(Constants.DIFFICULTY_TABLE_PACKET_ID.toString());
+			.newSimpleChannel(Constants.DIFFICULTY_TABLE_PACKET_ID);
 
 	public static int nextID() {
 		return packetId++;
