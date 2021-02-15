@@ -10,6 +10,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import sn2.timecraft.ITimeCraftPlayer;
+import sn2.timecraft.util.CraftingSpeedHelper;
 
 @Mixin(EntityPlayerSP.class)
 public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITimeCraftPlayer {
@@ -75,7 +76,7 @@ public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITi
 				}
 			}
 			if (this.getCraftTime() < this.getCraftPeriod()) {
-				this.craft_time += 1F + 0.02F * Math.min(this.experienceLevel, 200);
+				this.craft_time += CraftingSpeedHelper.getCraftingSpeed(this);
 			}
 			if (this.getCraftTime() >= this.getCraftPeriod()) {
 				this.craft_time = 0F;
