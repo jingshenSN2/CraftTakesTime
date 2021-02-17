@@ -1,9 +1,9 @@
 [
 {
   "modid": "timecraft",
-  "name": "Craft Time",
+  "name": "Craft Takes Time",
   "description": "Time to craft!",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "mcversion": "${mcversion}",
   "url": "https://www.curseforge.com/minecraft/mc-mods/craft-time",
   "updateUrl": "https://raw.githubusercontent.com/jingshenSN2/CraftTime/1.16-forge/update.json",
