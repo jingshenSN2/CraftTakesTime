@@ -4,12 +4,15 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import sn2.timecraft.ITimeCraftPlayer;
+import sn2.timecraft.sound.CraftingTickableSound;
+import sn2.timecraft.sound.SoundEventRegistry;
 import sn2.timecraft.util.CraftingSpeedHelper;
 
 @Mixin(EntityPlayerSP.class)
@@ -61,8 +64,10 @@ public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITi
 
 	@Override
 	public void startCraftWithNewPeriod(float craft_period) {
+		this.craft_time = 0F;
 		this.craft_period = craft_period;
 		this.is_crafting = true;
+		Minecraft.getMinecraft().getSoundHandler().playSound(new CraftingTickableSound(this, this.getPosition()));
 	}
 	
 	@Override
@@ -78,8 +83,9 @@ public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITi
 			if (this.getCraftTime() < this.getCraftPeriod()) {
 				this.craft_time += CraftingSpeedHelper.getCraftingSpeed(this);
 			}
-			if (this.getCraftTime() >= this.getCraftPeriod()) {
-				this.craft_time = 0F;
+			else if (this.getCraftTime() >= this.getCraftPeriod()) {
+				this.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
+				this.startCraftWithNewPeriod(craft_period);
 				return true;
 			}
 		}

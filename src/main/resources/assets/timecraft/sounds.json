@@ -1,0 +1,22 @@
+{
+  "crafting": {
+    "subtitle": "crafting",
+    "replace": "true",
+    "sounds": [
+      {
+        "name": "timecraft:crafting",
+        "steam": true
+      }
+    ]
+  }, 
+  "finish": {
+    "subtitle": "finish",
+    "replace": "true",
+    "sounds": [
+      {
+        "name": "timecraft:finish",
+        "steam": true
+      }
+    ]
+  }
+}
