@@ -18,7 +18,8 @@ public class CraftingTickableSound extends MovingSound {
 	      this.yPosF = (float)pos.getY();
 	      this.zPosF = (float)pos.getZ();
 	   }
-
+	   
+	   @Override
 	   public void update() {
 		   if (this.player.getCraftTime() >= this.player.getCraftPeriod() || !this.player.isCrafting()) {
 			   this.donePlaying = true;

@@ -20,7 +20,7 @@ public class CraftingDifficultyHelper {
 	}
 
 	public static float getCraftingDifficultyFromMatrix(ArrayList<Slot> slots) {
-		float basic_difficulty = 20F;
+		float basic_difficulty = 5F;
 		float item_difficulty = 0F;
 		for (Slot s : slots) {
 			Item item = s.getStack().getItem();

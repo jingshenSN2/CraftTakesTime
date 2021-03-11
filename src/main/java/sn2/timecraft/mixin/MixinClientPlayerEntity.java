@@ -67,7 +67,9 @@ public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITi
 		this.craft_time = 0F;
 		this.craft_period = craft_period;
 		this.is_crafting = true;
-		Minecraft.getMinecraft().getSoundHandler().playSound(new CraftingTickableSound(this, this.getPosition()));
+		if (craft_period >= 10F) {
+			Minecraft.getMinecraft().getSoundHandler().playSound(new CraftingTickableSound(this, this.getPosition()));
+		}
 	}
 	
 	@Override
@@ -77,7 +79,7 @@ public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITi
 			if (cursorStack.getItem() != Items.AIR) {
 				if (!cursorStack.isItemEqual(resultStack)
 						|| cursorStack.getCount() + resultStack.getCount() > cursorStack.getMaxStackSize()) {
-					this.stopCraft();
+					return false;
 				}
 			}
 			if (this.getCraftTime() < this.getCraftPeriod()) {
