@@ -4,7 +4,6 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import com.mojang.authlib.GameProfile;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -18,7 +17,9 @@ import sn2.timecraft.util.CraftingSpeedHelper;
 
 @Mixin(ClientPlayerEntity.class)
 public class MixinClientPlayerEntity extends AbstractClientPlayerEntity implements ITimeCraftPlayer {
-
+	
+	private CraftingTickableSound sound;
+	
 	public MixinClientPlayerEntity(ClientWorld world, GameProfile profile) {
 		super(world, profile);
 	}
@@ -65,11 +66,13 @@ public class MixinClientPlayerEntity extends AbstractClientPlayerEntity implemen
 
 	@Override
 	public void startCraftWithNewPeriod(float craft_period) {
+		this.sound.stop = true;
 		this.craft_time = 0;
 		this.craft_period = craft_period;
 		this.is_crafting = true;
 		if (craft_period >= 10F) {
-			Minecraft.getInstance().getSoundHandler().play(new CraftingTickableSound(this, this.getPosition()));
+			this.sound = new CraftingTickableSound(this, this.getPosition());
+			// Minecraft.getInstance().getSoundHandler().play(this.sound);
 		}
 	}
 	

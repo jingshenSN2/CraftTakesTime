@@ -6,7 +6,9 @@ import net.minecraft.util.math.BlockPos;
 import sn2.timecraft.ITimeCraftPlayer;
 
 public class CraftingTickableSound extends TickableSound {
-	   private final ITimeCraftPlayer player;
+	   private ITimeCraftPlayer player;
+	   private float last_craft_time;
+	   public boolean stop;
 
 	   public CraftingTickableSound(ITimeCraftPlayer player, BlockPos pos) {
 	      super(SoundEventRegistry.craftingSound.get(), SoundCategory.PLAYERS);
@@ -17,22 +19,17 @@ public class CraftingTickableSound extends TickableSound {
 	      this.x = (double)((float)pos.getX());
 	      this.y = (double)((float)pos.getY());
 	      this.z = (double)((float)pos.getZ());
-	   }
-
-	   @Override
-	   public boolean shouldPlaySound() {
-	      return this.player.isCrafting();
+	      this.last_craft_time = 0;
+	      this.stop = false;
 	   }
 	   
-	   @Override
-	   public boolean canBeSilent() {
-	      return true;
-	   }
-	   
-	   @Override
 	   public void tick() {
-		   if (this.player.getCraftTime() >= this.player.getCraftPeriod()) {
+		   float new_craft_time = player.getCraftTime();
+		   if (this.stop || !this.player.isCrafting() || this.last_craft_time == new_craft_time) {
 			   this.finishPlaying();
+		   }
+		   else {
+			   this.last_craft_time = new_craft_time;
 		   }
 	   }
 }

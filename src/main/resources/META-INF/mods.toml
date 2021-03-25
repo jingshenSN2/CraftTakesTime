@@ -4,7 +4,7 @@ license="MIT"
 issueTrackerURL="https://github.com/jingshenSN2/CraftTime/issues" #optional
 [[mods]] #mandatory
 modId="timecraft" #mandatory
-version="0.4.4" #mandatory
+version="0.4.5" #mandatory
 displayName="Craft Takes Time" #mandatory
 updateJSONURL="https://raw.githubusercontent.com/jingshenSN2/CraftTime/1.16-forge/update.json" #optional
 displayURL="https://www.curseforge.com/minecraft/mc-mods/craft-time" #optional
@@ -22,6 +22,6 @@ description=''' Time to craft!
 [[dependencies.timecraft]]
     modId="minecraft"
     mandatory=true
-   versionRange="[1.16.4,1.17)"
+   versionRange="[1.16.5,1.17)"
     ordering="NONE"
     side="BOTH"
