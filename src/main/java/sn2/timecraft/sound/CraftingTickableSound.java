@@ -25,11 +25,15 @@ public class CraftingTickableSound extends TickableSound {
 	   
 	   public void tick() {
 		   float new_craft_time = player.getCraftTime();
-		   if (this.stop || !this.player.isCrafting() || this.last_craft_time == new_craft_time) {
+		   if (this.stop || !this.player.isCrafting()) {
 			   this.finishPlaying();
+			   return;
 		   }
-		   else {
-			   this.last_craft_time = new_craft_time;
+		   if (this.last_craft_time == new_craft_time) {
+			   this.volume = 0.0F;
+		   } else {
+			   this.volume = 1.0F;
 		   }
+		   this.last_craft_time = new_craft_time;
 	   }
 }

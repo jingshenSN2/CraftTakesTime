@@ -4,6 +4,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import com.mojang.authlib.GameProfile;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraft.client.world.ClientWorld;
@@ -66,26 +67,36 @@ public class MixinClientPlayerEntity extends AbstractClientPlayerEntity implemen
 
 	@Override
 	public void startCraftWithNewPeriod(float craft_period) {
-		this.sound.stop = true;
+		if (this.sound != null) {
+			this.sound.stop = true;
+		}
 		this.craft_time = 0;
 		this.craft_period = craft_period;
 		this.is_crafting = true;
 		if (craft_period >= 10F) {
 			this.sound = new CraftingTickableSound(this, this.getPosition());
-			// Minecraft.getInstance().getSoundHandler().play(this.sound);
+			// Minecraft.getInstance().getSoundHandler().playOnNextTick(this.sound);
 		}
 	}
+	
+	public boolean checkHandStack(ItemStack resultStack) {
+		ItemStack cursorStack = this.inventory.getItemStack();
+		if (cursorStack.getItem() != Items.AIR) {
+			if (!cursorStack.isItemEqual(resultStack)
+					|| cursorStack.getCount() + resultStack.getCount() > cursorStack.getMaxStackSize()) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	
 	@Override
 	public boolean tick(ItemStack resultStack) {
 		if (this.isCrafting()) {
-			ItemStack cursorStack = this.inventory.getItemStack();
-			if (cursorStack.getItem() != Items.AIR) {
-				if (!cursorStack.isItemEqual(resultStack)
-						|| cursorStack.getCount() + resultStack.getCount() > cursorStack.getMaxStackSize()) {
-					return false;
-				}
-			}
+			boolean flag = this.checkHandStack(resultStack);
+			if (!flag)
+				return false;
 			if (this.getCraftTime() < this.getCraftPeriod()) {
 				this.craft_time += CraftingSpeedHelper.getCraftingSpeed(this);
 			}
