@@ -28,8 +28,8 @@ public class ConfigLoader {
 	public static void genSampleConfig() {
 		HashMap<String, JsonObject> nameSpaceMap = new HashMap<>();
 		ForgeRegistries.ITEMS.getKeys().forEach(rkey -> {
-			String namespace = rkey.getResourceDomain();
-			String path = rkey.getResourcePath();
+			String namespace = rkey.getNamespace();
+			String path = rkey.getPath();
 			if (!nameSpaceMap.containsKey(namespace)) {
 				JsonObject array = new JsonObject();
 				nameSpaceMap.put(namespace, array);
