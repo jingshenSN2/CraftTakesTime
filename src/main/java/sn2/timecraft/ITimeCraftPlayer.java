@@ -4,22 +4,22 @@ import net.minecraft.item.ItemStack;
 
 public interface ITimeCraftPlayer {
 
-	public void setCrafting(boolean is_crafting);
+    public boolean isCrafting();
 
-	public boolean isCrafting();
+    public void setCrafting(boolean isCrafting);
 
-	public void setCraftTime(float craft_time);
+    public float getCraftTime();
 
-	public float getCraftTime();
+    public void setCraftTime(float craftTime);
 
-	public void setCraftPeriod(float craft_period);
+    public float getCraftPeriod();
 
-	public float getCraftPeriod();
-	
-	public void stopCraft();
-	
-	public void startCraftWithNewPeriod(float craft_period);
+    public void setCraftPeriod(float craftPeriod);
 
-	public boolean tick(ItemStack resultStack);
+    public void stopCraft();
+
+    public void startCraft();
+
+    public boolean tick(ItemStack resultStack);
 
 }

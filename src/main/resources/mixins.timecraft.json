@@ -6,9 +6,8 @@
   "mixins": [
   ],
   "client": [
-	"MixinClientPlayerEntity",
-	"MixinCraftingScreen",
-	"MixinInventoryScreen"
+    "MixinClientPlayerEntity",
+    "MixinGuiContainer"
   ],
   "injectors": {
     "defaultRequire": 1
