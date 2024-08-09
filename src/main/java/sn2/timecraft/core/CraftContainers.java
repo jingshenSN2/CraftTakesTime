@@ -28,10 +28,10 @@ public class CraftContainers {
                 .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                 .guiContainerClassName("net.minecraft.client.gui.inventory.GuiCrafting")
                 .drawCraftingOverlay(true)
-                .overlayX(89)
+                .overlayX(88)
                 .overlayY(35)
-                .overlayWidth(27)
-                .overlayHeight(17)
+                .overlayWidth(26)
+                .overlayHeight(16)
                 .build());
         // craftingstation:crafting_station
         registerCraftContainer(CraftContainerProperties.builder()
@@ -39,10 +39,10 @@ public class CraftContainers {
                 .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                 .guiContainerClassName("com.tfar.craftingstation.client.CraftingStationScreen")
                 .drawCraftingOverlay(true)
-                .overlayX(89)
+                .overlayX(88)
                 .overlayY(35)
-                .overlayWidth(27)
-                .overlayHeight(17)
+                .overlayWidth(26)
+                .overlayHeight(16)
                 .build());
     }
 
