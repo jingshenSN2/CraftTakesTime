@@ -1,4 +1,4 @@
-package sn2.timecraft.config;
+package sn2.timecraft.core;
 
 import lombok.Builder;
 import lombok.Data;

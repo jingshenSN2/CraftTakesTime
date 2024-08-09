@@ -1,12 +1,11 @@
 package sn2.timecraft.mixin;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,22 +14,14 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import sn2.timecraft.ITimeCraftGuiContainer;
 import sn2.timecraft.ITimeCraftPlayer;
-import sn2.timecraft.config.CraftContainerProperties;
-import sn2.timecraft.config.CraftContainers;
-import sn2.timecraft.util.CraftingDifficultyHelper;
-
-import java.util.List;
+import sn2.timecraft.core.CraftContainerProperties;
 
 @Mixin(GuiContainer.class)
-public abstract class MixinGuiContainer extends GuiScreen {
+public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftGuiContainer {
 
     private static final Logger log = LogManager.getLogger(MixinGuiContainer.class);
-
-    private static final ResourceLocation CRAFT_OVERLAY_TEXTURE = new ResourceLocation(
-            "textures/gui/craft_overlay.png");
-    @Shadow
-    public Container inventorySlots;
     @Shadow
     protected int guiLeft;
     @Shadow
@@ -46,79 +37,39 @@ public abstract class MixinGuiContainer extends GuiScreen {
     @Shadow
     protected abstract void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type);
 
-    @Inject(method = "drawScreen", at = @At("TAIL"), cancellable = true)
+    @Override
+    public void handleCraftFinished(Slot slotIn, int slotId) {
+        this.finished = true;
+        this.handleMouseClick(slotIn, slotId, 0, ClickType.PICKUP);
+    }
+
+    @Inject(method = "drawScreen", at = @At("TAIL"))
     public void timecraft$drawScreen(int mouseX, int mouseY, float partialTicks,
                                      CallbackInfo ci) {
         player = (ITimeCraftPlayer) this.mc.player;
-        CraftContainerProperties properties = getCraftContainerProperties();
-        int resultSlot = properties.getResultSlot();
-
-        ItemStack resultStack = this.inventorySlots.getSlot(resultSlot).getStack();
-
-        // Skip if the result slot is empty
-        if (resultStack.isEmpty()) {
-            return;
-        }
+        player.getCraftManager().setGuiContainer((GuiContainer) (Object) this);
+        CraftContainerProperties properties = player.getCraftManager().getCraftContainerProperties();
 
         // Skip if the player is not crafting
-        if (!player.isCrafting()) {
+        if (!player.getCraftManager().isCrafting()) {
             return;
         }
 
         // Draw the crafting overlay
-        if (properties.isDrawCraftingOverlay() && player.getCraftPeriod() > 0) {
-            this.mc.getTextureManager().bindTexture(CRAFT_OVERLAY_TEXTURE);
-            float percentage = player.getCraftTime() / player.getCraftPeriod();
+        if (properties.isDrawCraftingOverlay() && player.getCraftManager().getCraftPeriod() > 0) {
+            ResourceLocation craftOverlay = new ResourceLocation(
+                    "timecraft", "textures/gui/craft_overlay.png");
+            Minecraft.getMinecraft().getTextureManager().bindTexture(craftOverlay);
+            float percentage = player.getCraftManager().getCurrentCraftTime() / player.getCraftManager().getCraftPeriod();
             int progressWidth = (int) (percentage * properties.getOverlayWidth());
-            MixinGuiContainer.drawModalRectWithCustomSizedTexture(
+            drawModalRectWithCustomSizedTexture(
                     this.guiLeft + properties.getOverlayX(),
                     this.guiTop + properties.getOverlayY(),
-                    0, 0,
+                    0.0F, 0.0F,
                     progressWidth,
                     properties.getOverlayHeight(),
                     properties.getOverlayWidth(),
                     properties.getOverlayHeight());
-        }
-    }
-
-
-    @Inject(method = "updateScreen", at = @At("TAIL"), cancellable = true)
-    public void timecraft$updateScreen(CallbackInfo ci) {
-        player = (ITimeCraftPlayer) this.mc.player;
-        CraftContainerProperties properties = getCraftContainerProperties();
-        int resultSlot = properties.getResultSlot();
-        List<Integer> ingredientSlots = properties.getIngredientSlots();
-
-        ItemStack resultStack = this.inventorySlots.getSlot(resultSlot).getStack();
-
-        // Skip if the result slot is empty
-        if (resultStack.isEmpty()) {
-            return;
-        }
-
-        // Skip if the player is not crafting
-        if (!player.isCrafting()) {
-            return;
-        }
-
-        // Tick the player
-        finished = player.tick(resultStack);
-
-        if (finished) {
-            // Record the old recipe before picking up the result item
-            List<Item> oldRecipe = CraftingDifficultyHelper.getIngredientItems(
-                    this.inventorySlots, ingredientSlots);
-
-            this.handleMouseClick(this.inventorySlots.getSlot(resultSlot), resultSlot, 0, ClickType.PICKUP);
-
-            // Compare the old recipe with the new recipe
-            List<Item> newRecipe = CraftingDifficultyHelper.getIngredientItems(
-                    this.inventorySlots, ingredientSlots);
-            if (!oldRecipe.equals(newRecipe)) {
-                player.stopCraft();
-            } else {
-                player.startCraft();
-            }
         }
     }
 
@@ -131,44 +82,14 @@ public abstract class MixinGuiContainer extends GuiScreen {
             return;
         }
         player = (ITimeCraftPlayer) this.mc.player;
-        if (slot != null) {
-            CraftContainerProperties properties = getCraftContainerProperties();
-            if (properties != null) {
-                if (properties.getResultSlot() == invSlot) {
-                    log.debug("Result slot clicked, {}", slot);
-                    ItemStack resultStack = this.inventorySlots.getSlot(invSlot).getStack();
-
-                    // Skip if the result slot is empty
-                    if (resultStack.isEmpty()) {
-                        player.stopCraft();
-                        return;
-                    }
-
-                    if (!player.isCrafting()) {
-                        player.setCraftPeriod(CraftingDifficultyHelper.getCraftingDifficultyFromIngredients(
-                                CraftingDifficultyHelper.getIngredientItems(
-                                        this.inventorySlots, properties.getIngredientSlots()),
-                                5F, 1F));
-                        player.startCraft();
-                    }
-                    info.cancel();
-                    return;
-                }
-            }
-            player.stopCraft();
-            log.debug("Inv slot {}, gui class {}, properties {}",
-                    invSlot, this.getClass().getName(), properties);
+        if (player.getCraftManager().initCraft(invSlot)) {
+            info.cancel();
         }
     }
 
-    @Inject(method = "onGuiClosed", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "onGuiClosed", at = @At("HEAD"))
     public void timecraft$onClose(CallbackInfo info) {
-        if (player != null) {
-            player.stopCraft();
-        }
-    }
-
-    private CraftContainerProperties getCraftContainerProperties() {
-        return CraftContainers.getInstance().getCraftContainerProperties(this.getClass().getName());
+        player = (ITimeCraftPlayer) this.mc.player;
+        player.getCraftManager().unsetGuiContainer();
     }
 }
