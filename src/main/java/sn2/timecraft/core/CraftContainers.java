@@ -30,7 +30,7 @@ public class CraftContainers {
                 .drawCraftingOverlay(true)
                 .overlayX(89)
                 .overlayY(35)
-                .overlayWidth(24)
+                .overlayWidth(27)
                 .overlayHeight(17)
                 .build());
         // craftingstation:crafting_station
@@ -41,7 +41,7 @@ public class CraftContainers {
                 .drawCraftingOverlay(true)
                 .overlayX(89)
                 .overlayY(35)
-                .overlayWidth(24)
+                .overlayWidth(27)
                 .overlayHeight(17)
                 .build());
     }

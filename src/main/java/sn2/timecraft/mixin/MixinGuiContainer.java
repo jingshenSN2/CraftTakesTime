@@ -1,8 +1,8 @@
 package sn2.timecraft.mixin;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
@@ -43,12 +43,25 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
         this.handleMouseClick(slotIn, slotId, 0, ClickType.PICKUP);
     }
 
+    @Inject(method = "initGui*", at = @At("TAIL"))
+    public void timecraft$initGui(CallbackInfo ci) {
+        player = (ITimeCraftPlayer) this.mc.player;
+        player.getCraftManager().setGuiContainer((GuiContainer) (Object) this);
+    }
+
     @Inject(method = "drawScreen", at = @At("TAIL"))
     public void timecraft$drawScreen(int mouseX, int mouseY, float partialTicks,
                                      CallbackInfo ci) {
-        player = (ITimeCraftPlayer) this.mc.player;
-        player.getCraftManager().setGuiContainer((GuiContainer) (Object) this);
+        if (player == null) {
+            return;
+        }
+
         CraftContainerProperties properties = player.getCraftManager().getCraftContainerProperties();
+
+        // Skip if the properties are not set for this container
+        if (properties == null) {
+            return;
+        }
 
         // Skip if the player is not crafting
         if (!player.getCraftManager().isCrafting()) {
@@ -59,9 +72,12 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
         if (properties.isDrawCraftingOverlay() && player.getCraftManager().getCraftPeriod() > 0) {
             ResourceLocation craftOverlay = new ResourceLocation(
                     "timecraft", "textures/gui/craft_overlay.png");
-            Minecraft.getMinecraft().getTextureManager().bindTexture(craftOverlay);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            this.mc.getTextureManager().bindTexture(craftOverlay);
             float percentage = player.getCraftManager().getCurrentCraftTime() / player.getCraftManager().getCraftPeriod();
             int progressWidth = (int) (percentage * properties.getOverlayWidth());
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.disableLighting();
             drawModalRectWithCustomSizedTexture(
                     this.guiLeft + properties.getOverlayX(),
                     this.guiTop + properties.getOverlayY(),
@@ -70,6 +86,8 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
                     properties.getOverlayHeight(),
                     properties.getOverlayWidth(),
                     properties.getOverlayHeight());
+            GlStateManager.enableLighting();
+            GlStateManager.enableRescaleNormal();
         }
     }
 
