@@ -13,7 +13,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 
 version = mod_version
 group = mod_group
@@ -62,6 +62,7 @@ dependencies {
     }
 
     compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
@@ -86,11 +87,14 @@ processResources {
 
 sourceSets {
     main {
-        refMap = mod_mixin_refmap.replace('${mod_id}', mod_id)
+        resources {
+            srcDir 'resources'
+        }
     }
 }
 
 mixin {
+    add sourceSets.main, mod_mixin_refmap.replace('${mod_id}', mod_id)
     config mod_mixin_configs.replace('${mod_id}', mod_id)
 }
 

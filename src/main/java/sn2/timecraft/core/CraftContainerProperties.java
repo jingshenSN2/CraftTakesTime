@@ -3,11 +3,17 @@ package sn2.timecraft.core;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Data
 @Builder
 public class CraftContainerProperties {
+    /**
+     * The class name of the GUI container
+     */
+    private String guiContainerClassName;
+
     /**
      * The slot index of the result item
      */
@@ -17,12 +23,8 @@ public class CraftContainerProperties {
     /**
      * The slot indices of the ingredients
      */
-    private List<Integer> ingredientSlots;
-
-    /**
-     * The class name of the GUI container
-     */
-    private String guiContainerClassName;
+    @Builder.Default
+    private List<Integer> ingredientSlots = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     /**
      * Whether to draw the crafting overlay
@@ -34,25 +36,29 @@ public class CraftContainerProperties {
      * The texture resource location of the crafting overlay
      */
     @Builder.Default
-    private String overlayTexture = "timecraft:textures/gui/crafting_overlay_default";
+    private String overlayTexture = "timecraft:textures/gui/crafting_overlay_default.png";
 
     /**
      * The x-coordinate of the crafting overlay, relative to the GUI container guiLeft
      */
-    private int overlayX;
+    @Builder.Default
+    private int overlayX = 88;
 
     /**
      * The y-coordinate of the crafting overlay, relative to the GUI container guiTop
      */
-    private int overlayY;
+    @Builder.Default
+    private int overlayY = 35;
 
     /**
      * The width of the crafting overlay
      */
-    private int overlayWidth;
+    @Builder.Default
+    private int overlayWidth = 24;
 
     /**
      * The height of the crafting overlay
      */
-    private int overlayHeight;
+    @Builder.Default
+    private int overlayHeight = 16;
 }

@@ -23,21 +23,11 @@ public class CraftContainers {
                 .build());
         // minecraft:crafting_table
         registerCraftContainer(CraftContainerProperties.builder()
-                .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                 .guiContainerClassName("net.minecraft.client.gui.inventory.GuiCrafting")
-                .overlayX(88)
-                .overlayY(35)
-                .overlayWidth(24)
-                .overlayHeight(16)
                 .build());
         // craftingstation:crafting_station
         registerCraftContainer(CraftContainerProperties.builder()
-                .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                 .guiContainerClassName("com.tfar.craftingstation.client.CraftingStationScreen")
-                .overlayX(88)
-                .overlayY(35)
-                .overlayWidth(24)
-                .overlayHeight(16)
                 .build());
         // sevendaystomine:workbench
         registerCraftContainer(CraftContainerProperties.builder()
