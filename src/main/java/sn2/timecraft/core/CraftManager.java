@@ -26,6 +26,7 @@ public class CraftManager {
     private GuiContainer currentGuiContainer;
 
     private boolean crafting = false;
+    private int waitCounter = 0;
     private float currentCraftTime = 0;
     private float craftPeriod = 0;
     private ItemStack resultStack;
@@ -111,7 +112,12 @@ public class CraftManager {
 
             // Stop crafting if the result slot is empty
             if (resultStack.isEmpty()) {
-                this.stopCraft();
+                if (waitCounter < 5) {
+                    waitCounter++;
+                } else {
+                    waitCounter = 0;
+                    this.stopCraft();
+                }
                 return;
             }
 
@@ -141,6 +147,7 @@ public class CraftManager {
                 if (!oldRecipe.equals(newRecipe)) {
                     this.stopCraft();
                 } else {
+                    waitCounter = 0;
                     this.startCraft();
                 }
             }
