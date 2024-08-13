@@ -11,7 +11,8 @@ public class CraftContainerProperties {
     /**
      * The slot index of the result item
      */
-    private int resultSlot;
+    @Builder.Default
+    private int resultSlot = 0;
 
     /**
      * The slot indices of the ingredients
@@ -26,7 +27,14 @@ public class CraftContainerProperties {
     /**
      * Whether to draw the crafting overlay
      */
-    private boolean drawCraftingOverlay;
+    @Builder.Default
+    private boolean drawCraftingOverlay = true;
+
+    /**
+     * The texture resource location of the crafting overlay
+     */
+    @Builder.Default
+    private String overlayTexture = "timecraft:textures/gui/crafting_overlay_default";
 
     /**
      * The x-coordinate of the crafting overlay, relative to the GUI container guiLeft

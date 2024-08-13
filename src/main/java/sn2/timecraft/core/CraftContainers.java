@@ -13,10 +13,9 @@ public class CraftContainers {
     private CraftContainers() {
         // minecraft:inventory
         registerCraftContainer(CraftContainerProperties.builder()
-                .resultSlot(0)
                 .ingredientSlots(Arrays.asList(1, 2, 3, 4))
                 .guiContainerClassName("net.minecraft.client.gui.inventory.GuiInventory")
-                .drawCraftingOverlay(true)
+                .overlayTexture("timecraft:textures/gui/crafting_overlay_inventory.png")
                 .overlayX(134)
                 .overlayY(29)
                 .overlayWidth(18)
@@ -24,24 +23,31 @@ public class CraftContainers {
                 .build());
         // minecraft:crafting_table
         registerCraftContainer(CraftContainerProperties.builder()
-                .resultSlot(0)
                 .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                 .guiContainerClassName("net.minecraft.client.gui.inventory.GuiCrafting")
-                .drawCraftingOverlay(true)
                 .overlayX(88)
                 .overlayY(35)
-                .overlayWidth(26)
+                .overlayWidth(24)
                 .overlayHeight(16)
                 .build());
         // craftingstation:crafting_station
         registerCraftContainer(CraftContainerProperties.builder()
-                .resultSlot(0)
                 .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9))
                 .guiContainerClassName("com.tfar.craftingstation.client.CraftingStationScreen")
-                .drawCraftingOverlay(true)
                 .overlayX(88)
                 .overlayY(35)
-                .overlayWidth(26)
+                .overlayWidth(24)
+                .overlayHeight(16)
+                .build());
+        // sevendaystomine:workbench
+        registerCraftContainer(CraftContainerProperties.builder()
+                .resultSlot(0)
+                .ingredientSlots(Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+                        , 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25))
+                .guiContainerClassName("nuparu.sevendaystomine.client.gui.inventory.GuiWorkbench")
+                .overlayX(100)
+                .overlayY(44)
+                .overlayWidth(24)
                 .overlayHeight(16)
                 .build());
     }
