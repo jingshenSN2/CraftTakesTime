@@ -70,8 +70,7 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
 
         // Draw the crafting overlay
         if (properties.isDrawCraftingOverlay() && player.getCraftManager().getCraftPeriod() > 0) {
-            ResourceLocation craftOverlay = new ResourceLocation(
-                    "timecraft", "textures/gui/craft_overlay.png");
+            ResourceLocation craftOverlay = new ResourceLocation(properties.getOverlayTexture());
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.mc.getTextureManager().bindTexture(craftOverlay);
             float percentage = player.getCraftManager().getCurrentCraftTime() / player.getCraftManager().getCraftPeriod();

@@ -13,7 +13,6 @@ import sn2.timecraft.ITimeCraftGuiContainer;
 import sn2.timecraft.ITimeCraftPlayer;
 import sn2.timecraft.sound.CraftingTickableSound;
 import sn2.timecraft.sound.SoundEventRegistry;
-import sn2.timecraft.util.CraftingDifficultyHelper;
 import sn2.timecraft.util.CraftingSpeedHelper;
 
 import java.util.List;
@@ -53,11 +52,12 @@ public class CraftManager {
 
     public boolean initCraft(int invSlot) {
         CraftContainerProperties properties = this.getCraftContainerProperties();
+        log.debug("Inv slot {}, gui class {}, properties {}",
+                invSlot, this.getCurrentGuiContainer().getClass().getName(), properties);
+
         if (properties == null) {
             return false;
         }
-        log.debug("Inv slot {}, gui class {}, properties {}",
-                invSlot, this.getCurrentGuiContainer().getClass().getName(), properties);
 
         // Check if clicking the result slot
         int resultSlot = properties.getResultSlot();
@@ -73,8 +73,8 @@ public class CraftManager {
 
         // Check if the player is already crafting
         if (!isCrafting()) {
-            this.craftPeriod = CraftingDifficultyHelper.getCraftingDifficultyFromIngredients(
-                    CraftingDifficultyHelper.getIngredientItems(
+            this.craftPeriod = Ingredients.getInstance().getCraftingDifficultyFromIngredients(
+                    Ingredients.getInstance().getIngredientItems(
                             this.currentGuiContainer.inventorySlots, properties.getIngredientSlots()),
                     5F, 1F);
             startCraft();
@@ -129,14 +129,14 @@ public class CraftManager {
                 this.player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
 
                 // Record the old recipe before picking up the result item
-                List<Item> oldRecipe = CraftingDifficultyHelper.getIngredientItems(
+                List<Item> oldRecipe = Ingredients.getInstance().getIngredientItems(
                         this.currentGuiContainer.inventorySlots, ingredientSlots);
 
                 ((ITimeCraftGuiContainer) this.currentGuiContainer).handleCraftFinished(
                         this.getCurrentGuiContainer().inventorySlots.getSlot(resultSlot), resultSlot);
 
                 // Compare the old recipe with the new recipe
-                List<Item> newRecipe = CraftingDifficultyHelper.getIngredientItems(
+                List<Item> newRecipe = Ingredients.getInstance().getIngredientItems(
                         this.getCurrentGuiContainer().inventorySlots, ingredientSlots);
                 if (!oldRecipe.equals(newRecipe)) {
                     this.stopCraft();
