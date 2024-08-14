@@ -20,6 +20,12 @@ public class CraftContainerProperties {
     private String guiContainerClassName;
 
     /**
+     * Whether the container is enabled for crafting time
+     */
+    @Builder.Default
+    private boolean enabled = true;
+
+    /**
      * The multiplier for the crafting time
      */
     @Builder.Default

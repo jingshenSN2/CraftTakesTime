@@ -47,8 +47,12 @@ public class CraftManager {
         if (this.currentGuiContainer == null) {
             return null;
         }
-        return CraftContainers.getInstance()
+        CraftContainerProperties properties = CraftContainers.getInstance()
                 .getCraftContainerProperties(this.currentGuiContainer.getClass().getName());
+        if (properties == null || !properties.isEnabled()) {
+            return null;
+        }
+        return properties;
     }
 
     public boolean initCraft(int invSlot) {

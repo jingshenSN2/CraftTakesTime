@@ -25,6 +25,8 @@ public class ConfigLoader {
     public static Path cfgPath = Loader.instance().getConfigDir().toPath().resolve("crafttakestime");
     public static String GLOBAL = "global_multiplier";
     public static String CONTAINERS = "containers";
+    public static String CONTAINER_ENABLED = "enabled";
+    public static String CONTAINER_TIME_MULTIPLIER = "time_multiplier";
     public static String MODS = "mods";
     public static String MOD_MULTIPLIER = "mod_multiplier";
     public static String ITEMS = "items";
@@ -54,8 +56,11 @@ public class ConfigLoader {
             JsonObject container_list = object.getAsJsonObject(CONTAINERS);
             container_list.entrySet().forEach(e -> {
                 String container = e.getKey();
-                float value = e.getValue().getAsFloat();
-                CraftContainers.getInstance().getCraftContainerProperties(container).setContainerMultiplier(value);
+                JsonObject properties = (JsonObject) e.getValue();
+                boolean enabled = properties.getAsJsonPrimitive(CONTAINER_ENABLED).getAsBoolean();
+                float time_multiplier = properties.getAsJsonPrimitive(CONTAINER_TIME_MULTIPLIER).getAsFloat();
+                CraftContainers.getInstance().getCraftContainerProperties(container).setEnabled(enabled);
+                CraftContainers.getInstance().getCraftContainerProperties(container).setContainerMultiplier(time_multiplier);
             });
 
             // Load item multipliers
@@ -92,10 +97,13 @@ public class ConfigLoader {
         all.addProperty(GLOBAL, 1F);
 
         // Get all containers
-        // { "containers": { "minecraft:inventory": 1F } }
         JsonObject container_list = new JsonObject();
-        CraftContainers.getInstance().getCraftContainers().forEach((name, properties) ->
-                container_list.addProperty(properties.getContainerName(), 1F));
+        CraftContainers.getInstance().getCraftContainers().forEach((name, properties) -> {
+            JsonObject container = new JsonObject();
+            container.addProperty(CONTAINER_ENABLED, properties.isEnabled());
+            container.addProperty(CONTAINER_TIME_MULTIPLIER, properties.getContainerMultiplier());
+            container_list.add(name, container);
+        });
         all.add(CONTAINERS, container_list);
 
         // Get all items
