@@ -7,7 +7,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import sn2.timecraft.ITimeCraftPlayer;
 import sn2.timecraft.config.ConfigLoader;
 import sn2.timecraft.core.CraftManager;
 import sn2.timecraft.networking.PacketCraftConfig;
@@ -35,7 +34,6 @@ public class Events {
         if (event.side.isServer()) {
             return;
         }
-        ITimeCraftPlayer player = (ITimeCraftPlayer) event.player;
-        player.getCraftManager().tick();
+        CraftManager.getInstance().tick();
     }
 }

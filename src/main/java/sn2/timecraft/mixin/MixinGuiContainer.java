@@ -15,8 +15,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import sn2.timecraft.ITimeCraftGuiContainer;
-import sn2.timecraft.ITimeCraftPlayer;
 import sn2.timecraft.core.CraftContainerProperties;
+import sn2.timecraft.core.CraftManager;
 
 @Mixin(GuiContainer.class)
 public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftGuiContainer {
@@ -26,8 +26,8 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
     protected int guiLeft;
     @Shadow
     protected int guiTop;
-    private ITimeCraftPlayer player;
     private boolean finished = false;
+    private CraftManager manager = CraftManager.getInstance();
 
     public MixinGuiContainer(Container inventorySlotsIn) {
         super();
@@ -45,18 +45,13 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
 
     @Inject(method = "initGui*", at = @At("TAIL"))
     public void timecraft$initGui(CallbackInfo ci) {
-        player = (ITimeCraftPlayer) this.mc.player;
-        player.getCraftManager().setGuiContainer((GuiContainer) (Object) this);
+        manager.setCurrentGuiContainer((GuiContainer) (Object) this);
     }
 
     @Inject(method = "drawScreen", at = @At("TAIL"))
     public void timecraft$drawScreen(int mouseX, int mouseY, float partialTicks,
                                      CallbackInfo ci) {
-        if (player == null) {
-            return;
-        }
-
-        CraftContainerProperties properties = player.getCraftManager().getCraftContainerProperties();
+        CraftContainerProperties properties = manager.getCraftContainerProperties();
 
         // Skip if the properties are not set for this container
         if (properties == null) {
@@ -64,17 +59,17 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
         }
 
         // Skip if the player is not crafting
-        if (!player.getCraftManager().isCrafting()) {
+        if (!manager.isCrafting()) {
             return;
         }
 
         // Draw the crafting overlay
-        if (properties.isDrawCraftingOverlay() && player.getCraftManager().getCraftPeriod() > 0) {
+        if (properties.isDrawCraftingOverlay() && manager.getCraftPeriod() > 0) {
             String[] namespaceAndPath = properties.getOverlayTexture().split(":");
             ResourceLocation craftOverlay = new ResourceLocation(namespaceAndPath[0], namespaceAndPath[1]);
             GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
             this.mc.getTextureManager().bindTexture(craftOverlay);
-            float percentage = player.getCraftManager().getCurrentCraftTime() / player.getCraftManager().getCraftPeriod();
+            float percentage = manager.getCurrentCraftTime() / manager.getCraftPeriod();
             int progressWidth = (int) (percentage * properties.getOverlayWidth());
             GlStateManager.disableRescaleNormal();
             GlStateManager.disableLighting();
@@ -99,15 +94,13 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
             finished = false;
             return;
         }
-        player = (ITimeCraftPlayer) this.mc.player;
-        if (player.getCraftManager().initCraft(invSlot)) {
+        if (manager.initCraft(invSlot)) {
             info.cancel();
         }
     }
 
     @Inject(method = "onGuiClosed", at = @At("HEAD"))
     public void timecraft$onClose(CallbackInfo info) {
-        player = (ITimeCraftPlayer) this.mc.player;
-        player.getCraftManager().unsetGuiContainer();
+        manager.unsetGuiContainer();
     }
 }
