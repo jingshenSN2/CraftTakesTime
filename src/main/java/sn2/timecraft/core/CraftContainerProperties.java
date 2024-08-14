@@ -10,9 +10,20 @@ import java.util.List;
 @Builder
 public class CraftContainerProperties {
     /**
+     * The block name of the GUI container
+     */
+    private String containerName;
+
+    /**
      * The class name of the GUI container
      */
     private String guiContainerClassName;
+
+    /**
+     * The multiplier for the crafting time
+     */
+    @Builder.Default
+    private float containerMultiplier = 1.0f;
 
     /**
      * The slot index of the result item

@@ -77,7 +77,7 @@ public class CraftManager {
             this.craftPeriod = Ingredients.getInstance().getCraftingDifficultyFromIngredients(
                     Ingredients.getInstance().getIngredientItems(
                             this.currentGuiContainer.inventorySlots, properties.getIngredientSlots()),
-                    5F, 1F);
+                    5F, 1F, properties.getContainerMultiplier());
             startCraft();
         }
         return true;

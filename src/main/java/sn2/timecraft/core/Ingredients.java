@@ -39,14 +39,14 @@ public class Ingredients {
     }
 
     public float getCraftingDifficultyFromIngredients(
-            List<Item> items, float basicDifficulty, float itemDifficultyMultiplier) {
+            List<Item> items, float basicDifficulty, float itemDifficultyMultiplier, float containerMultiplier) {
         float itemDifficulty = 0F;
         for (Item item : items) {
             if (item == Items.AIR)
                 continue;
             itemDifficulty += getDifficulty(item);
         }
-        return basicDifficulty + itemDifficulty * itemDifficultyMultiplier;
+        return (basicDifficulty + itemDifficulty * itemDifficultyMultiplier) * containerMultiplier;
     }
 
     public List<Item> getIngredientItems(Container handler, List<Integer> ingredientSlots) {
