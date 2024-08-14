@@ -11,14 +11,13 @@ import sn2.timecraft.core.CraftManager;
 @Mixin(EntityPlayerSP.class)
 public class MixinClientPlayerEntity extends AbstractClientPlayer implements ITimeCraftPlayer {
 
-    private CraftManager craftManager = new CraftManager();
-
     public MixinClientPlayerEntity(World world, GameProfile profile) {
         super(world, profile);
     }
 
     @Override
     public CraftManager getCraftManager() {
+        CraftManager craftManager = CraftManager.getInstance();
         craftManager.setPlayer(this);
         return craftManager;
     }

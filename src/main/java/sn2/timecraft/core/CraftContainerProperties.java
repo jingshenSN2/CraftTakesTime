@@ -20,22 +20,16 @@ public class CraftContainerProperties {
     private String guiContainerClassName;
 
     /**
-     * Whether the container is enabled for crafting time
-     */
-    @Builder.Default
-    private boolean enabled = true;
-
-    /**
      * The multiplier for the crafting time
      */
     @Builder.Default
     private float containerMultiplier = 1.0f;
 
     /**
-     * The slot index of the result item
+     * The slot index of the output item
      */
     @Builder.Default
-    private int resultSlot = 0;
+    private int outputSlot = 0;
 
     /**
      * The slot indices of the ingredients

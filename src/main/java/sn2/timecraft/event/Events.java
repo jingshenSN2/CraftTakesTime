@@ -9,8 +9,8 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import sn2.timecraft.ITimeCraftPlayer;
 import sn2.timecraft.config.ConfigLoader;
-import sn2.timecraft.core.Ingredients;
-import sn2.timecraft.networking.PacketCraftingDifficulty;
+import sn2.timecraft.core.CraftManager;
+import sn2.timecraft.networking.PacketCraftConfig;
 import sn2.timecraft.networking.TimeCraftPacketHandler;
 
 @Mod.EventBusSubscriber()
@@ -26,10 +26,8 @@ public class Events {
     @SubscribeEvent
     public static void onPlayerLogin(PlayerLoggedInEvent event) {
         EntityPlayer player = event.player;
-        Ingredients.getInstance().getDifficultyMap().forEach((item, difficulty) -> {
-            PacketCraftingDifficulty packet = new PacketCraftingDifficulty(item, difficulty);
-            TimeCraftPacketHandler.INSTANCE.sendTo(packet, (EntityPlayerMP) player);
-        });
+        PacketCraftConfig packet = new PacketCraftConfig(CraftManager.getInstance().getConfig());
+        TimeCraftPacketHandler.INSTANCE.sendTo(packet, (EntityPlayerMP) player);
     }
 
     @SubscribeEvent

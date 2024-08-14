@@ -1,82 +1,37 @@
 package sn2.timecraft.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.minecraft.item.Item;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.experimental.UtilityClass;
 import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sn2.timecraft.Constants;
 import sn2.timecraft.core.CraftContainers;
-import sn2.timecraft.core.Ingredients;
+import sn2.timecraft.core.CraftManager;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+@UtilityClass
 public class ConfigLoader {
 
+    public static final String CONFIG_FILENAME = "craft_time_config.json";
     private static final Logger log = LogManager.getLogger(ConfigLoader.class);
     public static Path cfgPath = Loader.instance().getConfigDir().toPath().resolve("crafttakestime");
-    public static String GLOBAL = "global_multiplier";
-    public static String CONTAINERS = "containers";
-    public static String CONTAINER_ENABLED = "enabled";
-    public static String CONTAINER_TIME_MULTIPLIER = "time_multiplier";
-    public static String MODS = "mods";
-    public static String MOD_MULTIPLIER = "mod_multiplier";
-    public static String ITEMS = "items";
-
-    public ConfigLoader() {
-    }
 
     public static void loadConfig() {
-        Ingredients instance = Ingredients.getInstance();
-        File cfgFile = cfgPath.resolve(Constants.CONFIG_FILENAME).toFile();
+        File cfgFile = cfgPath.resolve(CONFIG_FILENAME).toFile();
         if (!cfgFile.exists()) {
             genSampleConfig();
         }
         try {
             FileInputStream fis = new FileInputStream(cfgFile);
-            byte[] data = new byte[(int) cfgFile.length()];
-            fis.read(data);
-            fis.close();
-            String jsonString = new String(data, "UTF-8");
-            JsonParser parser = new JsonParser();
-            JsonObject object = (JsonObject) parser.parse(jsonString);
-
-            // Load global multiplier
-            float global_multiplier = object.getAsJsonPrimitive(GLOBAL).getAsFloat();
-
-            // Load container multipliers
-            JsonObject container_list = object.getAsJsonObject(CONTAINERS);
-            container_list.entrySet().forEach(e -> {
-                String container = e.getKey();
-                JsonObject properties = (JsonObject) e.getValue();
-                boolean enabled = properties.getAsJsonPrimitive(CONTAINER_ENABLED).getAsBoolean();
-                float time_multiplier = properties.getAsJsonPrimitive(CONTAINER_TIME_MULTIPLIER).getAsFloat();
-                CraftContainers.getInstance().getCraftContainerProperties(container).setEnabled(enabled);
-                CraftContainers.getInstance().getCraftContainerProperties(container).setContainerMultiplier(time_multiplier);
-            });
-
-            // Load item multipliers
-            JsonObject mod_list = object.getAsJsonObject(MODS);
-            mod_list.entrySet().forEach(e -> {
-                String namespace = e.getKey() + ':';
-                JsonObject mod = (JsonObject) e.getValue();
-                float mod_multiplier = mod.getAsJsonPrimitive(MOD_MULTIPLIER).getAsFloat() * global_multiplier;
-                JsonObject items = mod.getAsJsonObject(ITEMS);
-                items.entrySet().forEach(i -> {
-                    String item = namespace + i.getKey();
-                    int id = Item.getIdFromItem(Item.getByNameOrId(item));
-                    float value = i.getValue().getAsFloat() * mod_multiplier;
-                    instance.setDifficulty(id, value);
-                });
-            });
+            ObjectMapper mapper = new ObjectMapper();
+            // Read file to Config object
+            CraftConfig config = mapper.readValue(fis, CraftConfig.class);
+            // Set config
+            CraftManager.getInstance().setConfig(config);
         } catch (Exception e) {
             log.error("Failed to load config file, will use default values");
         }
@@ -92,47 +47,40 @@ public class ConfigLoader {
             }
         }
 
-        // Set global multiplier to 1
-        JsonObject all = new JsonObject();
-        all.addProperty(GLOBAL, 1F);
+        CraftConfig config = CraftConfig.builder()
+                .enableCraftingSound(true)
+                .globalCraftingTimeMultiplier(1F)
+                .containers(new HashMap<>())
+                .ingredientConfig(ItemConfig.builder()
+                        .modCraftingTimeMultipliers(new HashMap<>())
+                        .itemCraftingTimeMultipliers(new HashMap<>())
+                        .build())
+                .outputConfig(ItemConfig.builder()
+                        .modCraftingTimeMultipliers(new HashMap<>())
+                        .itemCraftingTimeMultipliers(new HashMap<>())
+                        .build())
+                .build();
 
-        // Get all containers
-        JsonObject container_list = new JsonObject();
+        // add all containers
         CraftContainers.getInstance().getCraftContainers().forEach((name, properties) -> {
-            JsonObject container = new JsonObject();
-            container.addProperty(CONTAINER_ENABLED, properties.isEnabled());
-            container.addProperty(CONTAINER_TIME_MULTIPLIER, properties.getContainerMultiplier());
-            container_list.add(name, container);
-        });
-        all.add(CONTAINERS, container_list);
-
-        // Get all items
-        JsonObject mod_list = new JsonObject();
-        all.add(MODS, mod_list);
-
-        HashMap<String, JsonObject> nameSpaceMap = new HashMap<>();
-        ForgeRegistries.ITEMS.getKeys().forEach(rkey -> {
-            String namespace = rkey.getNamespace();
-            String path = rkey.getPath();
-            if (!nameSpaceMap.containsKey(namespace)) {
-                JsonObject array = new JsonObject();
-                nameSpaceMap.put(namespace, array);
-            }
-            nameSpaceMap.get(namespace).addProperty(path, 20F);
-        });
-        nameSpaceMap.forEach((name, array) -> {
-            JsonObject mod = new JsonObject();
-            mod.addProperty(MOD_MULTIPLIER, 1F);
-            mod.add(ITEMS, array);
-            mod_list.add(name, mod);
+            config.getContainers().put(name, ContainerConfig.builder()
+                    .enabled(true)
+                    .craftingTimeMultiplier(properties.getContainerMultiplier())
+                    .build());
         });
 
+        // add sample items
+        config.getIngredientConfig().getModCraftingTimeMultipliers().put("minecraft", 1F);
+        config.getIngredientConfig().getItemCraftingTimeMultipliers().put("minecraft:stick", 1F);
+        config.getOutputConfig().getModCraftingTimeMultipliers().put("minecraft", 1F);
+        config.getOutputConfig().getItemCraftingTimeMultipliers().put("minecraft:stick", 1F);
+
+        // save to file, jackson
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.writer().withDefaultPrettyPrinter();
         try {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            File cfgSampleFile = cfgPath.resolve(Constants.CONFIG_FILENAME).toFile();
-            FileWriter writer = new FileWriter(cfgSampleFile);
-            writer.write(gson.toJson(all));
-            writer.close();
+            File cfgSampleFile = cfgPath.resolve(CONFIG_FILENAME).toFile();
+            mapper.writeValue(cfgSampleFile, config);
         } catch (Exception e) {
             log.error("Failed to generate sample config file");
         }

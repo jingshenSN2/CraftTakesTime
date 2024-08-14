@@ -5,33 +5,47 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sn2.timecraft.ITimeCraftGuiContainer;
 import sn2.timecraft.ITimeCraftPlayer;
+import sn2.timecraft.config.ContainerConfig;
+import sn2.timecraft.config.CraftConfig;
 import sn2.timecraft.sound.CraftingTickableSound;
 import sn2.timecraft.sound.SoundEventRegistry;
 import sn2.timecraft.util.CraftingSpeedHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class CraftManager {
 
     private static final Logger log = LogManager.getLogger(CraftManager.class);
-
+    private static final float BASE_CRAFTING_TIME_PER_ITEM = 20F;
+    // Singleton
+    private static CraftManager INSTANCE;
+    private CraftConfig config;
     private EntityPlayer player;
     private GuiContainer currentGuiContainer;
-
     private boolean crafting = false;
     private int waitCounter = 0;
     private float currentCraftTime = 0;
     private float craftPeriod = 0;
     private ItemStack resultStack;
 
-    public CraftManager() {
+    private CraftManager() {
+    }
+
+    public static CraftManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new CraftManager();
+        }
+        return INSTANCE;
     }
 
     public void setGuiContainer(GuiContainer guiContainer) {
@@ -49,7 +63,9 @@ public class CraftManager {
         }
         CraftContainerProperties properties = CraftContainers.getInstance()
                 .getCraftContainerProperties(this.currentGuiContainer.getClass().getName());
-        if (properties == null || !properties.isEnabled()) {
+        if (properties == null ||
+                config.getContainers().get(properties.getContainerName()) == null ||
+                !config.getContainers().get(properties.getContainerName()).isEnabled()) {
             return null;
         }
         return properties;
@@ -65,23 +81,21 @@ public class CraftManager {
         }
 
         // Check if clicking the result slot
-        int resultSlot = properties.getResultSlot();
-        if (invSlot != resultSlot) {
+        int outputSlot = properties.getOutputSlot();
+        if (invSlot != outputSlot) {
             stopCraft();
             return false;
         }
 
         // Check if the result slot is empty
-        if (this.currentGuiContainer.inventorySlots.getSlot(resultSlot).getStack().isEmpty()) {
+        if (this.currentGuiContainer.inventorySlots.getSlot(outputSlot).getStack().isEmpty()) {
             return false;
         }
 
         // Check if the player is already crafting
         if (!isCrafting()) {
-            this.craftPeriod = Ingredients.getInstance().getCraftingDifficultyFromIngredients(
-                    Ingredients.getInstance().getIngredientItems(
-                            this.currentGuiContainer.inventorySlots, properties.getIngredientSlots()),
-                    5F, 1F, properties.getContainerMultiplier());
+            craftPeriod = getCraftingTime(
+                    this.currentGuiContainer.inventorySlots, outputSlot, properties.getIngredientSlots(), properties);
             startCraft();
         }
         return true;
@@ -108,11 +122,11 @@ public class CraftManager {
             return;
         }
         if (this.isCrafting()) {
-            int resultSlot = properties.getResultSlot();
+            int outputSlot = properties.getOutputSlot();
             List<Integer> ingredientSlots = properties.getIngredientSlots();
 
             ItemStack resultStack = this.currentGuiContainer
-                    .inventorySlots.getSlot(resultSlot).getStack();
+                    .inventorySlots.getSlot(outputSlot).getStack();
 
             // Stop crafting if the result slot is empty
             if (resultStack.isEmpty()) {
@@ -139,14 +153,14 @@ public class CraftManager {
                 this.player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
 
                 // Record the old recipe before picking up the result item
-                List<Item> oldRecipe = Ingredients.getInstance().getIngredientItems(
-                        this.currentGuiContainer.inventorySlots, ingredientSlots);
+                List<Item> oldRecipe = getIngredientItems(
+                        this.getCurrentGuiContainer().inventorySlots, ingredientSlots);
 
                 ((ITimeCraftGuiContainer) this.currentGuiContainer).handleCraftFinished(
-                        this.getCurrentGuiContainer().inventorySlots.getSlot(resultSlot), resultSlot);
+                        this.getCurrentGuiContainer().inventorySlots.getSlot(outputSlot), outputSlot);
 
                 // Compare the old recipe with the new recipe
-                List<Item> newRecipe = Ingredients.getInstance().getIngredientItems(
+                List<Item> newRecipe = getIngredientItems(
                         this.getCurrentGuiContainer().inventorySlots, ingredientSlots);
                 if (!oldRecipe.equals(newRecipe)) {
                     this.stopCraft();
@@ -156,5 +170,62 @@ public class CraftManager {
                 }
             }
         }
+    }
+
+    private List<Item> getIngredientItems(Container handler, List<Integer> ingredientSlots) {
+        List<Item> items = new ArrayList<Item>();
+        for (int i : ingredientSlots) {
+            items.add(handler.getSlot(i).getStack().getItem());
+        }
+        return items;
+    }
+
+    private Item getOutputItem(Container handler, int outputSlot) {
+        return handler.getSlot(outputSlot).getStack().getItem();
+    }
+
+    private float getCraftingTime(Container handler,
+                                  int outputSlot,
+                                  List<Integer> ingredientSlots,
+                                  CraftContainerProperties properties) {
+        // Container multiplier
+        float containerMultiplier = 1F;
+        ContainerConfig containerConfig = config.getContainers().get(properties.getContainerName());
+        if (containerConfig != null) {
+            containerMultiplier = containerConfig.getCraftingTimeMultiplier();
+        }
+
+        // Ingredient multiplier
+        List<Item> ingredients = getIngredientItems(handler, ingredientSlots);
+        float ingredientDifficulty = 0F;
+        for (Item item : ingredients) {
+            if (item == Items.AIR) {
+                continue;
+            }
+            ResourceLocation registry = item.getRegistryName();
+            if (registry == null) {
+                continue;
+            }
+            float modMultiplier = config.getIngredientConfig().getModCraftingTimeMultipliers()
+                    .getOrDefault(registry.getNamespace(), 1F);
+            float itemMultiplier = config.getIngredientConfig().getItemCraftingTimeMultipliers()
+                    .getOrDefault(registry.toString(), 1F);
+            ingredientDifficulty += modMultiplier * itemMultiplier;
+        }
+
+        // Output multiplier
+        Item outputItem = getOutputItem(handler, outputSlot);
+        ResourceLocation outputRegistry = outputItem.getRegistryName();
+        float outputMultiplier = 1F;
+        if (outputRegistry != null) {
+            float modMultiplier = config.getOutputConfig().getModCraftingTimeMultipliers()
+                    .getOrDefault(outputRegistry.getNamespace(), 1F);
+            float itemMultiplier = config.getOutputConfig().getItemCraftingTimeMultipliers()
+                    .getOrDefault(outputRegistry.toString(), 1F);
+            outputMultiplier = modMultiplier * itemMultiplier;
+        }
+
+        // Final crafting time
+        return BASE_CRAFTING_TIME_PER_ITEM * ingredientDifficulty * outputMultiplier * containerMultiplier;
     }
 }
