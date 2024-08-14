@@ -49,7 +49,7 @@ repositories {
 
 configurations {
     embed
-    compile.extendsFrom(embed)
+    implementation.extendsFrom(embed)
 }
 
 dependencies {
@@ -64,8 +64,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
-    
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.2'
 
     compileOnly fileTree(dir: 'libs', include: ['*.jar'])
 }

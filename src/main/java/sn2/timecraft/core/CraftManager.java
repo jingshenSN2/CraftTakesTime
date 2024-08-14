@@ -64,8 +64,8 @@ public class CraftManager {
         CraftContainerProperties properties = CraftContainers.getInstance()
                 .getCraftContainerProperties(this.currentGuiContainer.getClass().getName());
         if (properties == null ||
-                config.getContainers().get(properties.getContainerName()) == null ||
-                !config.getContainers().get(properties.getContainerName()).isEnabled()) {
+                (config.getContainers().get(properties.getContainerName()) != null &&
+                        !config.getContainers().get(properties.getContainerName()).isEnabled())) {
             return null;
         }
         return properties;
@@ -73,8 +73,10 @@ public class CraftManager {
 
     public boolean initCraft(int invSlot) {
         CraftContainerProperties properties = this.getCraftContainerProperties();
-        log.debug("Inv slot {}, gui class {}, properties {}",
-                invSlot, this.getCurrentGuiContainer().getClass().getName(), properties);
+        if (config.isDebug()) {
+            log.info("Inv slot {}, gui class {}, properties {}",
+                    invSlot, this.getCurrentGuiContainer().getClass().getName(), properties);
+        }
 
         if (properties == null) {
             return false;
@@ -104,7 +106,7 @@ public class CraftManager {
     public void startCraft() {
         this.crafting = true;
         this.currentCraftTime = 0;
-        if (craftPeriod >= 10F) {
+        if (craftPeriod >= 10F && config.isEnableCraftingSound()) {
             Minecraft.getMinecraft().getSoundHandler().playSound(
                     new CraftingTickableSound(
                             (ITimeCraftPlayer) this.player, this.player.getPosition()));
@@ -150,7 +152,9 @@ public class CraftManager {
             if (this.getCurrentCraftTime() < this.getCraftPeriod()) {
                 this.currentCraftTime += CraftingSpeedHelper.getCraftingSpeed(this.player);
             } else if (this.getCurrentCraftTime() >= this.getCraftPeriod()) {
-                this.player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
+                if (config.isEnableCraftingSound()) {
+                    this.player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
+                }
 
                 // Record the old recipe before picking up the result item
                 List<Item> oldRecipe = getIngredientItems(
@@ -188,6 +192,9 @@ public class CraftManager {
                                   int outputSlot,
                                   List<Integer> ingredientSlots,
                                   CraftContainerProperties properties) {
+        // Global multiplier
+        float globalMultiplier = config.getGlobalCraftingTimeMultiplier();
+
         // Container multiplier
         float containerMultiplier = 1F;
         ContainerConfig containerConfig = config.getContainers().get(properties.getContainerName());
@@ -226,6 +233,7 @@ public class CraftManager {
         }
 
         // Final crafting time
-        return BASE_CRAFTING_TIME_PER_ITEM * ingredientDifficulty * outputMultiplier * containerMultiplier;
+        return BASE_CRAFTING_TIME_PER_ITEM * ingredientDifficulty * outputMultiplier
+                * containerMultiplier * globalMultiplier;
     }
 }

@@ -1,6 +1,6 @@
 package sn2.timecraft.networking;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -27,12 +27,12 @@ public class PacketCraftConfig implements IMessage {
 
     @Override
     public void fromBytes(ByteBuf buf) {
-        ObjectMapper mapper = new ObjectMapper();
+        Gson gson = new Gson();
         try {
             byte[] bytes = new byte[buf.readableBytes()];
             buf.readBytes(bytes);
             String json = new String(bytes);
-            config = mapper.readValue(json, CraftConfig.class);
+            config = gson.fromJson(json, CraftConfig.class);
         } catch (Exception e) {
             log.error("Failed to read config from bytes");
         }
@@ -40,9 +40,9 @@ public class PacketCraftConfig implements IMessage {
 
     @Override
     public void toBytes(ByteBuf buf) {
-        ObjectMapper mapper = new ObjectMapper();
+        Gson gson = new Gson();
         try {
-            String json = mapper.writeValueAsString(config);
+            String json = gson.toJson(config);
             buf.writeBytes(json.getBytes());
         } catch (Exception e) {
             log.error("Failed to write config to bytes");

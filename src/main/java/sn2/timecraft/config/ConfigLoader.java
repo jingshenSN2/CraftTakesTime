@@ -1,6 +1,7 @@
 package sn2.timecraft.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import lombok.experimental.UtilityClass;
 import net.minecraftforge.fml.common.Loader;
 import org.apache.logging.log4j.LogManager;
@@ -9,7 +10,7 @@ import sn2.timecraft.core.CraftContainers;
 import sn2.timecraft.core.CraftManager;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
@@ -26,10 +27,10 @@ public class ConfigLoader {
             genSampleConfig();
         }
         try {
-            FileInputStream fis = new FileInputStream(cfgFile);
-            ObjectMapper mapper = new ObjectMapper();
+            Gson gson = new Gson();
             // Read file to Config object
-            CraftConfig config = mapper.readValue(fis, CraftConfig.class);
+            byte[] configBytes = Files.readAllBytes(cfgPath.resolve(CONFIG_FILENAME));
+            CraftConfig config = gson.fromJson(new String(configBytes), CraftConfig.class);
             // Set config
             CraftManager.getInstance().setConfig(config);
         } catch (Exception e) {
@@ -48,6 +49,7 @@ public class ConfigLoader {
         }
 
         CraftConfig config = CraftConfig.builder()
+                .debug(false)
                 .enableCraftingSound(true)
                 .globalCraftingTimeMultiplier(1F)
                 .containers(new HashMap<>())
@@ -63,10 +65,11 @@ public class ConfigLoader {
 
         // add all containers
         CraftContainers.getInstance().getCraftContainers().forEach((name, properties) -> {
-            config.getContainers().put(name, ContainerConfig.builder()
-                    .enabled(true)
-                    .craftingTimeMultiplier(properties.getContainerMultiplier())
-                    .build());
+            config.getContainers().put(properties.getContainerName(),
+                    ContainerConfig.builder()
+                            .enabled(true)
+                            .craftingTimeMultiplier(properties.getContainerMultiplier())
+                            .build());
         });
 
         // add sample items
@@ -75,12 +78,11 @@ public class ConfigLoader {
         config.getOutputConfig().getModCraftingTimeMultipliers().put("minecraft", 1F);
         config.getOutputConfig().getItemCraftingTimeMultipliers().put("minecraft:stick", 1F);
 
-        // save to file, jackson
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.writer().withDefaultPrettyPrinter();
+        // save to file
+        GsonBuilder gsonBuilder = new GsonBuilder();
         try {
-            File cfgSampleFile = cfgPath.resolve(CONFIG_FILENAME).toFile();
-            mapper.writeValue(cfgSampleFile, config);
+            Files.write(cfgPath.resolve(CONFIG_FILENAME),
+                    gsonBuilder.setPrettyPrinting().create().toJson(config).getBytes());
         } catch (Exception e) {
             log.error("Failed to generate sample config file");
         }
