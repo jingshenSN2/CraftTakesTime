@@ -93,22 +93,22 @@ public class CraftManager {
         if (!isCrafting()) {
             craftPeriod = getCraftingTime(
                     this.currentGuiContainer.inventorySlots, outputSlot, properties.getIngredientSlots(), properties);
+
+            if (craftPeriod >= 10F && config.isEnableCraftingSound()) {
+                EntityPlayer player = Minecraft.getMinecraft().player;
+                if (player != null) {
+                    Minecraft.getMinecraft().getSoundHandler().playSound(
+                            new CraftingTickableSound(player.getPosition()));
+                }
+            }
             startCraft();
         }
         return true;
     }
 
     private void startCraft() {
-        EntityPlayer player = Minecraft.getMinecraft().player;
-        if (player == null) {
-            return;
-        }
         this.crafting = true;
         this.currentCraftTime = 0;
-        if (craftPeriod >= 10F && config.isEnableCraftingSound()) {
-            Minecraft.getMinecraft().getSoundHandler().playSound(
-                    new CraftingTickableSound(player.getPosition()));
-        }
     }
 
     private void stopCraft() {
@@ -185,6 +185,7 @@ public class CraftManager {
         for (int i : ingredientSlots) {
             items.add(handler.getSlot(i).getStack().getItem());
         }
+        log.info("Ingredient items: {}", items);
         return items;
     }
 
