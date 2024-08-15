@@ -2,8 +2,8 @@ package sn2.timecraft.core;
 
 import lombok.Builder;
 import lombok.Data;
+import sn2.timecraft.util.RangeHelper;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -35,7 +35,7 @@ public class CraftContainerProperties {
      * The slot indices of the ingredients
      */
     @Builder.Default
-    private List<Integer> ingredientSlots = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    private List<Integer> ingredientSlots = RangeHelper.range(1, 9);
 
     /**
      * Whether to draw the crafting overlay
