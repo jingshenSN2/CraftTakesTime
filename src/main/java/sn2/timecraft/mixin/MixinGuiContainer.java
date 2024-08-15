@@ -27,7 +27,7 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
     @Shadow
     protected int guiTop;
     private boolean finished = false;
-    private CraftManager manager = CraftManager.getInstance();
+    private CraftManager manager;
 
     public MixinGuiContainer(Container inventorySlotsIn) {
         super();
@@ -45,44 +45,53 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
 
     @Inject(method = "initGui*", at = @At("TAIL"))
     public void timecraft$initGui(CallbackInfo ci) {
-        manager.setCurrentGuiContainer((GuiContainer) (Object) this);
+        try {
+            manager = CraftManager.getInstance();
+            manager.setCurrentGuiContainer((GuiContainer) (Object) this);
+        } catch (Exception e) {
+            log.error("Failed to set the current GUI container", e);
+        }
     }
 
     @Inject(method = "drawScreen", at = @At("TAIL"))
     public void timecraft$drawScreen(int mouseX, int mouseY, float partialTicks,
                                      CallbackInfo ci) {
-        CraftContainerProperties properties = manager.getCraftContainerProperties();
+        try {
+            CraftContainerProperties properties = manager.getCraftContainerProperties();
 
-        // Skip if the properties are not set for this container
-        if (properties == null) {
-            return;
-        }
+            // Skip if the properties are not set for this container
+            if (properties == null) {
+                return;
+            }
 
-        // Skip if the player is not crafting
-        if (!manager.isCrafting()) {
-            return;
-        }
+            // Skip if the player is not crafting
+            if (!manager.isCrafting()) {
+                return;
+            }
 
-        // Draw the crafting overlay
-        if (properties.isDrawCraftingOverlay() && manager.getCraftPeriod() > 0) {
-            String[] namespaceAndPath = properties.getOverlayTexture().split(":");
-            ResourceLocation craftOverlay = new ResourceLocation(namespaceAndPath[0], namespaceAndPath[1]);
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            this.mc.getTextureManager().bindTexture(craftOverlay);
-            float percentage = manager.getCurrentCraftTime() / manager.getCraftPeriod();
-            int progressWidth = (int) (percentage * properties.getOverlayWidth());
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.disableLighting();
-            drawModalRectWithCustomSizedTexture(
-                    this.guiLeft + properties.getOverlayX(),
-                    this.guiTop + properties.getOverlayY(),
-                    0.0F, 0.0F,
-                    progressWidth,
-                    properties.getOverlayHeight(),
-                    properties.getOverlayWidth(),
-                    properties.getOverlayHeight());
-            GlStateManager.enableLighting();
-            GlStateManager.enableRescaleNormal();
+            // Draw the crafting overlay
+            if (properties.isDrawCraftingOverlay() && manager.getCraftPeriod() > 0) {
+                String[] namespaceAndPath = properties.getOverlayTexture().split(":");
+                ResourceLocation craftOverlay = new ResourceLocation(namespaceAndPath[0], namespaceAndPath[1]);
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                this.mc.getTextureManager().bindTexture(craftOverlay);
+                float percentage = manager.getCurrentCraftTime() / manager.getCraftPeriod();
+                int progressWidth = (int) (percentage * properties.getOverlayWidth());
+                GlStateManager.disableRescaleNormal();
+                GlStateManager.disableLighting();
+                drawModalRectWithCustomSizedTexture(
+                        this.guiLeft + properties.getOverlayX(),
+                        this.guiTop + properties.getOverlayY(),
+                        0.0F, 0.0F,
+                        progressWidth,
+                        properties.getOverlayHeight(),
+                        properties.getOverlayWidth(),
+                        properties.getOverlayHeight());
+                GlStateManager.enableLighting();
+                GlStateManager.enableRescaleNormal();
+            }
+        } catch (Exception e) {
+            log.error("Failed to draw the crafting overlay", e);
         }
     }
 
@@ -94,13 +103,21 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
             finished = false;
             return;
         }
-        if (manager.initCraft(invSlot)) {
-            info.cancel();
+        try {
+            if (manager.initCraft(invSlot)) {
+                info.cancel();
+            }
+        } catch (Exception e) {
+            log.error("Failed to handle the mouse click", e);
         }
     }
 
     @Inject(method = "onGuiClosed", at = @At("HEAD"))
     public void timecraft$onClose(CallbackInfo info) {
-        manager.unsetGuiContainer();
+        try {
+            manager.unsetGuiContainer();
+        } catch (Exception e) {
+            log.error("Failed to unset the current GUI container", e);
+        }
     }
 }

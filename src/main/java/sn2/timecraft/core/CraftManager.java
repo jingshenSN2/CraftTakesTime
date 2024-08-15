@@ -12,7 +12,6 @@ import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sn2.timecraft.ITimeCraftGuiContainer;
-import sn2.timecraft.ITimeCraftPlayer;
 import sn2.timecraft.config.ContainerConfig;
 import sn2.timecraft.config.CraftConfig;
 import sn2.timecraft.sound.CraftingTickableSound;
@@ -30,7 +29,6 @@ public class CraftManager {
     // Singleton
     private static CraftManager INSTANCE;
     private CraftConfig config;
-    private EntityPlayer player;
     private GuiContainer currentGuiContainer;
     private boolean crafting = false;
     private int waitCounter = 0;
@@ -46,10 +44,6 @@ public class CraftManager {
             INSTANCE = new CraftManager();
         }
         return INSTANCE;
-    }
-
-    public void setGuiContainer(GuiContainer guiContainer) {
-        this.currentGuiContainer = guiContainer;
     }
 
     public void unsetGuiContainer() {
@@ -103,26 +97,35 @@ public class CraftManager {
         return true;
     }
 
-    public void startCraft() {
+    private void startCraft() {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player == null) {
+            return;
+        }
         this.crafting = true;
         this.currentCraftTime = 0;
         if (craftPeriod >= 10F && config.isEnableCraftingSound()) {
             Minecraft.getMinecraft().getSoundHandler().playSound(
-                    new CraftingTickableSound(
-                            (ITimeCraftPlayer) this.player, this.player.getPosition()));
+                    new CraftingTickableSound(player.getPosition()));
         }
     }
 
-    public void stopCraft() {
+    private void stopCraft() {
         this.crafting = false;
         this.currentCraftTime = 0;
     }
 
     public void tick() {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        if (player == null) {
+            return;
+        }
+
         CraftContainerProperties properties = this.getCraftContainerProperties();
         if (properties == null) {
             return;
         }
+
         if (this.isCrafting()) {
             int outputSlot = properties.getOutputSlot();
             List<Integer> ingredientSlots = properties.getIngredientSlots();
@@ -141,7 +144,7 @@ public class CraftManager {
                 return;
             }
 
-            ItemStack cursorStack = this.player.inventory.getItemStack();
+            ItemStack cursorStack = player.inventory.getItemStack();
             if (cursorStack.getItem() != Items.AIR) {
                 if (!cursorStack.isItemEqual(resultStack)
                         || cursorStack.getCount() + resultStack.getCount() > cursorStack.getMaxStackSize()) {
@@ -150,10 +153,10 @@ public class CraftManager {
                 }
             }
             if (this.getCurrentCraftTime() < this.getCraftPeriod()) {
-                this.currentCraftTime += CraftingSpeedHelper.getCraftingSpeed(this.player);
+                this.currentCraftTime += CraftingSpeedHelper.getCraftingSpeed(player);
             } else if (this.getCurrentCraftTime() >= this.getCraftPeriod()) {
                 if (config.isEnableCraftingSound()) {
-                    this.player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
+                    player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
                 }
 
                 // Record the old recipe before picking up the result item

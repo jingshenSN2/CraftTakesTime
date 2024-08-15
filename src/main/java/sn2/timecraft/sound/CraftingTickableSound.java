@@ -3,14 +3,12 @@ package sn2.timecraft.sound;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import sn2.timecraft.ITimeCraftPlayer;
+import sn2.timecraft.core.CraftManager;
 
 public class CraftingTickableSound extends MovingSound {
-    private final ITimeCraftPlayer player;
 
-    public CraftingTickableSound(ITimeCraftPlayer player, BlockPos pos) {
+    public CraftingTickableSound(BlockPos pos) {
         super(SoundEventRegistry.craftingSound, SoundCategory.PLAYERS);
-        this.player = player;
         this.repeat = true;
         this.repeatDelay = 3;
         this.volume = 1.0F;
@@ -21,7 +19,7 @@ public class CraftingTickableSound extends MovingSound {
 
     @Override
     public void update() {
-        if (!this.player.getCraftManager().isCrafting()) {
+        if (!CraftManager.getInstance().isCrafting()) {
             this.donePlaying = true;
             this.volume = 0;
         }
