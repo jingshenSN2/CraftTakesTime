@@ -7,10 +7,10 @@
     "mcversion": "${mcversion}",
     "url": "${mod_url}",
     "updateUrl": "",
-    "authorList": ${mod_author},
-  "credits": "",
-  "logoFile": "icon.png",
-  "screenshots": [],
-  "dependencies": []
+    "authorList": "${mod_author}",
+    "credits": "",
+    "logoFile": "icon.png",
+    "screenshots": [],
+    "dependencies": []
   }
 ]
