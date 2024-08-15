@@ -4,7 +4,6 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
 import org.apache.logging.log4j.LogManager;
@@ -22,17 +21,12 @@ import sn2.timecraft.core.CraftManager;
 public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftGuiContainer {
 
     private static final Logger log = LogManager.getLogger(MixinGuiContainer.class);
+    private final GuiContainer self = (GuiContainer) (Object) this;
     @Shadow
     protected int guiLeft;
     @Shadow
     protected int guiTop;
     private boolean finished = false;
-    private CraftManager manager;
-
-    public MixinGuiContainer(Container inventorySlotsIn) {
-        super();
-        this.allowUserInput = true;
-    }
 
     @Shadow
     protected abstract void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type);
@@ -43,20 +37,11 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
         this.handleMouseClick(slotIn, slotId, 0, ClickType.PICKUP);
     }
 
-    @Inject(method = "initGui*", at = @At("TAIL"))
-    public void timecraft$initGui(CallbackInfo ci) {
-        try {
-            manager = CraftManager.getInstance();
-            manager.setCurrentGuiContainer((GuiContainer) (Object) this);
-        } catch (Exception e) {
-            log.error("Failed to set the current GUI container", e);
-        }
-    }
-
     @Inject(method = "drawScreen", at = @At("TAIL"))
     public void timecraft$drawScreen(int mouseX, int mouseY, float partialTicks,
                                      CallbackInfo ci) {
         try {
+            CraftManager manager = CraftManager.getInstance();
             CraftContainerProperties properties = manager.getCraftContainerProperties();
 
             // Skip if the properties are not set for this container
@@ -104,20 +89,11 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
             return;
         }
         try {
-            if (manager.initCraft(invSlot)) {
+            if (CraftManager.getInstance().initCraft(self, invSlot)) {
                 info.cancel();
             }
         } catch (Exception e) {
             log.error("Failed to handle the mouse click", e);
-        }
-    }
-
-    @Inject(method = "onGuiClosed", at = @At("HEAD"))
-    public void timecraft$onClose(CallbackInfo info) {
-        try {
-            manager.unsetGuiContainer();
-        } catch (Exception e) {
-            log.error("Failed to unset the current GUI container", e);
         }
     }
 }

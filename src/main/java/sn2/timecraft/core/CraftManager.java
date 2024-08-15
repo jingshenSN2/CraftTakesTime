@@ -65,7 +65,8 @@ public class CraftManager {
         return properties;
     }
 
-    public boolean initCraft(int invSlot) {
+    public boolean initCraft(GuiContainer gui, int invSlot) {
+        this.setCurrentGuiContainer(gui);
         CraftContainerProperties properties = this.getCraftContainerProperties();
         if (config.isDebug()) {
             log.info("Inv slot {}, gui class {}, properties {}",
