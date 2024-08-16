@@ -51,6 +51,26 @@ public class CraftContainers {
                 .guiContainerClassName("com.tfar.craftingstation.client.CraftingStationScreen")
                 .build());
         registerCraftContainer(CraftContainerProperties.builder()
+                .containerName("tconstruct:craftingstation")
+                .guiContainerClassName("slimeknights.tconstruct.tools.common.client.GuiCraftingStation")
+                .build());
+        registerCraftContainer(CraftContainerProperties.builder()
+                .containerName("tconstruct:stenciltable")
+                .outputSlot(1)
+                .ingredientSlots(RangeHelper.range(0, 0))
+                .guiContainerClassName("slimeknights.tconstruct.tools.common.client.GuiStencilTable")
+                .overlayX(72)
+                .overlayY(35)
+                .build());
+        registerCraftContainer(CraftContainerProperties.builder()
+                .containerName("tconstruct:toolforge")
+                .outputSlot(6)
+                .ingredientSlots(RangeHelper.range(0, 5))
+                .guiContainerClassName("slimeknights.tconstruct.tools.common.client.GuiToolForge")
+                .overlayX(89)
+                .overlayY(38)
+                .build());
+        registerCraftContainer(CraftContainerProperties.builder()
                 .containerName("sevendaystomine:workbench")
                 .ingredientSlots(RangeHelper.range(1, 25))
                 .guiContainerClassName("nuparu.sevendaystomine.client.gui.inventory.GuiWorkbench")
