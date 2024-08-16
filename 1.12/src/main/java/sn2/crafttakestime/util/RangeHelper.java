@@ -9,6 +9,6 @@ import java.util.stream.IntStream;
 @UtilityClass
 public class RangeHelper {
     public static List<Integer> range(int start, int end) {
-        return IntStream.rangeClosed(1, 9).boxed().collect(Collectors.toList());
+        return IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList());
     }
 }
