@@ -53,7 +53,7 @@ public class CraftContainerProperties {
      * The x-coordinate of the crafting overlay, relative to the GUI container guiLeft
      */
     @Builder.Default
-    private int overlayX = 88;
+    private int overlayX = 89;
 
     /**
      * The y-coordinate of the crafting overlay, relative to the GUI container guiTop

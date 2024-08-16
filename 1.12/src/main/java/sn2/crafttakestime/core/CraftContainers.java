@@ -67,7 +67,6 @@ public class CraftContainers {
                 .outputSlot(6)
                 .ingredientSlots(RangeHelper.range(0, 5))
                 .guiContainerClassName("slimeknights.tconstruct.tools.common.client.GuiToolForge")
-                .overlayX(89)
                 .overlayY(38)
                 .build());
         registerCraftContainer(CraftContainerProperties.builder()
