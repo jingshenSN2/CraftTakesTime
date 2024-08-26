@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.List;
 
 @Data
 @Builder
@@ -13,7 +13,7 @@ public class CraftConfig {
     private boolean debug;
     private boolean enableCraftingSound;
     private float globalCraftingTimeMultiplier;
-    private Map<String, ContainerConfig> containers;
+    private List<ContainerConfig> containers;
     private ItemConfig ingredientConfig;
     private ItemConfig outputConfig;
 }

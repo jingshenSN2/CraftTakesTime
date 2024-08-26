@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import sn2.crafttakestime.ITimeCraftGuiContainer;
-import sn2.crafttakestime.core.CraftContainerProperties;
+import sn2.crafttakestime.config.ContainerConfig;
 import sn2.crafttakestime.core.CraftManager;
 
 @Mixin(GuiContainer.class)
@@ -42,10 +42,10 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
                                           CallbackInfo ci) {
         try {
             CraftManager manager = CraftManager.getInstance();
-            CraftContainerProperties properties = manager.getCraftContainerProperties();
+            ContainerConfig containerConfig = manager.getCraftContainerConfig();
 
             // Skip if the properties are not set for this container
-            if (properties == null) {
+            if (!containerConfig.isEnabled()) {
                 return;
             }
 
@@ -55,23 +55,23 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
             }
 
             // Draw the crafting overlay
-            if (properties.isDrawCraftingOverlay() && manager.getCraftPeriod() > 0) {
-                String[] namespaceAndPath = properties.getOverlayTexture().split(":");
+            if (containerConfig.isDrawCraftingOverlay() && manager.getCraftPeriod() > 0) {
+                String[] namespaceAndPath = containerConfig.getOverlayTexture().split(":");
                 ResourceLocation craftOverlay = new ResourceLocation(namespaceAndPath[0], namespaceAndPath[1]);
                 GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
                 this.mc.getTextureManager().bindTexture(craftOverlay);
                 float percentage = manager.getCurrentCraftTime() / manager.getCraftPeriod();
-                int progressWidth = (int) (percentage * properties.getOverlayWidth());
+                int progressWidth = (int) (percentage * containerConfig.getOverlayWidth());
                 GlStateManager.disableRescaleNormal();
                 GlStateManager.disableLighting();
                 drawModalRectWithCustomSizedTexture(
-                        this.guiLeft + properties.getOverlayX(),
-                        this.guiTop + properties.getOverlayY(),
+                        this.guiLeft + containerConfig.getOverlayX(),
+                        this.guiTop + containerConfig.getOverlayY(),
                         0.0F, 0.0F,
                         progressWidth,
-                        properties.getOverlayHeight(),
-                        properties.getOverlayWidth(),
-                        properties.getOverlayHeight());
+                        containerConfig.getOverlayHeight(),
+                        containerConfig.getOverlayWidth(),
+                        containerConfig.getOverlayHeight());
                 GlStateManager.enableLighting();
                 GlStateManager.enableRescaleNormal();
             }

@@ -17,6 +17,7 @@ import sn2.crafttakestime.config.CraftConfig;
 import sn2.crafttakestime.sound.CraftingTickableSound;
 import sn2.crafttakestime.sound.SoundEventRegistry;
 import sn2.crafttakestime.util.CraftingSpeedHelper;
+import sn2.crafttakestime.util.SlotRange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class CraftManager {
 
     private static final Logger log = LogManager.getLogger(CraftManager.class);
     private static final float BASE_CRAFTING_TIME_PER_ITEM = 20F;
+    private static final ContainerConfig DISABLED_CONTAINER = ContainerConfig.builder().enabled(false).build();
     // Singleton
     private static CraftManager INSTANCE;
     private CraftConfig config;
@@ -51,34 +53,30 @@ public class CraftManager {
         this.stopCraft();
     }
 
-    public CraftContainerProperties getCraftContainerProperties() {
+    public ContainerConfig getCraftContainerConfig() {
         if (this.currentGuiContainer == null) {
-            return null;
+            return DISABLED_CONTAINER;
         }
-        CraftContainerProperties properties = CraftContainers.getInstance()
-                .getCraftContainerProperties(this.currentGuiContainer.getClass().getName());
-        if (properties == null ||
-                (config.getContainers().get(properties.getContainerName()) != null &&
-                        !config.getContainers().get(properties.getContainerName()).isEnabled())) {
-            return null;
-        }
-        return properties;
+        String guiClassName = this.currentGuiContainer.getClass().getName();
+        return config.getContainers().stream().filter(container ->
+                        container.getGuiContainerClassName().equals(guiClassName))
+                .findFirst().orElse(DISABLED_CONTAINER);
     }
 
     public boolean initCraft(GuiContainer gui, int invSlot) {
         this.setCurrentGuiContainer(gui);
-        CraftContainerProperties properties = this.getCraftContainerProperties();
+        ContainerConfig containerConfig = this.getCraftContainerConfig();
         if (config.isDebug()) {
             log.info("Inv slot {}, gui class {}, properties {}",
-                    invSlot, this.getCurrentGuiContainer().getClass().getName(), properties);
+                    invSlot, this.getCurrentGuiContainer().getClass().getName(), containerConfig);
         }
 
-        if (properties == null) {
+        if (!containerConfig.isEnabled()) {
             return false;
         }
 
         // Check if clicking the result slot
-        int outputSlot = properties.getOutputSlot();
+        int outputSlot = containerConfig.getOutputSlot();
         if (invSlot != outputSlot) {
             stopCraft();
             return false;
@@ -92,7 +90,7 @@ public class CraftManager {
         // Check if the player is already crafting
         if (!isCrafting()) {
             craftPeriod = getCraftingTime(
-                    this.currentGuiContainer.inventorySlots, outputSlot, properties.getIngredientSlots(), properties);
+                    this.currentGuiContainer.inventorySlots, outputSlot, containerConfig.getIngredientSlots(), containerConfig);
 
             if (craftPeriod >= 10F && config.isEnableCraftingSound()) {
                 EntityPlayer player = Minecraft.getMinecraft().player;
@@ -122,14 +120,14 @@ public class CraftManager {
             return;
         }
 
-        CraftContainerProperties properties = this.getCraftContainerProperties();
-        if (properties == null) {
+        ContainerConfig containerConfig = this.getCraftContainerConfig();
+        if (!containerConfig.isEnabled()) {
             return;
         }
 
         if (this.isCrafting()) {
-            int outputSlot = properties.getOutputSlot();
-            List<Integer> ingredientSlots = properties.getIngredientSlots();
+            int outputSlot = containerConfig.getOutputSlot();
+            SlotRange ingredientSlots = containerConfig.getIngredientSlots();
 
             ItemStack resultStack = this.currentGuiContainer
                     .inventorySlots.getSlot(outputSlot).getStack();
@@ -180,7 +178,7 @@ public class CraftManager {
         }
     }
 
-    private List<Item> getIngredientItems(Container handler, List<Integer> ingredientSlots) {
+    private List<Item> getIngredientItems(Container handler, SlotRange ingredientSlots) {
         List<Item> items = new ArrayList<Item>();
         for (int i : ingredientSlots) {
             items.add(handler.getSlot(i).getStack().getItem());
@@ -195,14 +193,13 @@ public class CraftManager {
 
     private float getCraftingTime(Container handler,
                                   int outputSlot,
-                                  List<Integer> ingredientSlots,
-                                  CraftContainerProperties properties) {
+                                  SlotRange ingredientSlots,
+                                  ContainerConfig containerConfig) {
         // Global multiplier
         float globalMultiplier = config.getGlobalCraftingTimeMultiplier();
 
         // Container multiplier
         float containerMultiplier = 1F;
-        ContainerConfig containerConfig = config.getContainers().get(properties.getContainerName());
         if (containerConfig != null) {
             containerMultiplier = containerConfig.getCraftingTimeMultiplier();
         }
