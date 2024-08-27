@@ -18,8 +18,8 @@ public class DefaultCraftContainers {
         // minecraft inventory
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:inventory")
-                .ingredientSlots(SlotRange.fromString("1-4"))
                 .guiContainerClassName("net.minecraft.client.gui.screens.inventory.InventoryScreen")
+                .ingredientSlots(SlotRange.fromString("1-4"))
                 .overlayTexture("crafttakestime:textures/gui/crafting_overlay_inventory.png")
                 .overlayX(134)
                 .overlayY(29)
@@ -29,8 +29,8 @@ public class DefaultCraftContainers {
         // minecraft inventory with Curios API
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:inventory")
-                .ingredientSlots(SlotRange.fromString("1-4"))
                 .guiContainerClassName("top.theillusivec4.curios.client.gui.CuriosScreen")
+                .ingredientSlots(SlotRange.fromString("1-4"))
                 .overlayTexture("crafttakestime:textures/gui/crafting_overlay_inventory.png")
                 .overlayX(134)
                 .overlayY(29)
@@ -41,6 +41,24 @@ public class DefaultCraftContainers {
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:crafting_table")
                 .guiContainerClassName("net.minecraft.client.gui.screens.inventory.CraftingScreen")
+                .build());
+        // minecraft smithing table
+        registerCraftContainer(ContainerConfig.builder()
+                .containerName("minecraft:smithing_table")
+                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.LegacySmithingScreen")
+                .ingredientSlots(SlotRange.fromString("0-1"))
+                .outputSlot(2)
+                .overlayX(101)
+                .overlayY(48)
+                .build());
+        // minecraft anvil screen
+        registerCraftContainer(ContainerConfig.builder()
+                .containerName("minecraft:anvil")
+                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.AnvilScreen")
+                .ingredientSlots(SlotRange.fromString("0-1"))
+                .outputSlot(2)
+                .overlayX(101)
+                .overlayY(48)
                 .build());
     }
 

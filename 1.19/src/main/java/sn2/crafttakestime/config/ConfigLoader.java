@@ -15,6 +15,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public class ConfigLoader {
@@ -30,12 +32,14 @@ public class ConfigLoader {
     public static void loadConfig() {
         File cfgFile = CONFIG_PATH.resolve(CONFIG_FILENAME).toFile();
         if (!cfgFile.exists()) {
-            genSampleConfig();
+            generateSampleConfig();
         }
         try {
             // Read file to Config object
             byte[] configBytes = Files.readAllBytes(CONFIG_PATH.resolve(CONFIG_FILENAME));
             CraftConfig config = gson.fromJson(new String(configBytes), CraftConfig.class);
+            // Check if there are new containers
+            checkNewContainersAndUpdateConfig(config);
             // Set config
             CraftManager.getInstance().setConfig(config);
         } catch (Exception e) {
@@ -43,7 +47,7 @@ public class ConfigLoader {
         }
     }
 
-    private static void genSampleConfig() {
+    private static void generateSampleConfig() {
         // Make dir
         File cfgDir = CONFIG_PATH.toFile();
         if (!cfgDir.exists()) {
@@ -75,14 +79,29 @@ public class ConfigLoader {
         config.getOutputConfig().getItemCraftingTimeMultipliers().put("minecraft:stick", 1F);
 
         // save to file
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(SlotRange.class, new SlotRangeAdapter())
-                .setPrettyPrinting().create();
+        saveConfig(config);
+    }
+
+    private static void checkNewContainersAndUpdateConfig(CraftConfig config) {
+        Set<String> guiNamesInConfig = config.getContainers().stream()
+                .map(ContainerConfig::getGuiContainerClassName)
+                .collect(Collectors.toSet());
+        DefaultCraftContainers.getInstance().getCraftContainers().forEach(container -> {
+            if (!guiNamesInConfig.contains(container.getGuiContainerClassName())) {
+                log.warn("New container found: {}", container.getGuiContainerClassName());
+                config.getContainers().add(container);
+            }
+        });
+        saveConfig(config);
+    }
+
+    private static void saveConfig(CraftConfig config) {
+        // save to file
         try {
             Files.write(CONFIG_PATH.resolve(CONFIG_FILENAME),
                     gson.toJson(config).getBytes());
         } catch (Exception e) {
-            log.error("Failed to generate sample config file");
+            log.error("Failed to save config file");
         }
     }
 }
