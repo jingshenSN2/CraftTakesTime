@@ -98,4 +98,9 @@ public abstract class MixinContainerScreen<T extends AbstractContainerMenu> exte
             log.error("Failed to handle the mouse click", e);
         }
     }
+
+    @Inject(method = "onClose", at = @At("TAIL"))
+    public void crafttakestime$onClose(CallbackInfo ci) {
+        CraftManager.getInstance().unsetGuiContainer();
+    }
 }
