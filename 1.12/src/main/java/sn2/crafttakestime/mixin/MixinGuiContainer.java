@@ -96,4 +96,9 @@ public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftG
             log.error("Failed to handle the mouse click", e);
         }
     }
+
+    @Inject(method = "onGuiClosed", at = @At("TAIL"))
+    public void crafttakestime$onClose(CallbackInfo ci) {
+        CraftManager.getInstance().unsetGuiContainer();
+    }
 }
