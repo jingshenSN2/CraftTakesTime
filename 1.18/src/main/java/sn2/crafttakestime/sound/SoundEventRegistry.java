@@ -10,7 +10,7 @@ public class SoundEventRegistry {
 
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, "crafttakestime");
     public static RegistryObject<SoundEvent> craftingSound = SOUNDS.register("crafting", () ->
-            SoundEvent.createVariableRangeEvent(new ResourceLocation("crafttakestime", "crafting")));
+            new SoundEvent(new ResourceLocation("crafttakestime", "crafting")));
     public static RegistryObject<SoundEvent> finishSound = SOUNDS.register("finish", () ->
-            SoundEvent.createVariableRangeEvent(new ResourceLocation("crafttakestime", "finish")));
+            new SoundEvent(new ResourceLocation("crafttakestime", "finish")));
 }

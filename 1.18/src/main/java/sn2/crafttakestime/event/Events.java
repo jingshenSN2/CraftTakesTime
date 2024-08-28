@@ -23,7 +23,7 @@ public class Events {
 
     @SubscribeEvent
     public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        Player player = event.getEntity();
+        Player player = event.getPlayer();
         PacketCraftConfig packet = new PacketCraftConfig(CraftManager.getInstance().getConfig());
         TimeCraftPacketHandler.INSTANCE.send(
                 PacketDistributor.PLAYER.with(() -> (ServerPlayer) player),

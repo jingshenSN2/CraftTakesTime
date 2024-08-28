@@ -9,7 +9,7 @@ import sn2.crafttakestime.core.CraftManager;
 public class CraftingTickableSound extends AbstractTickableSoundInstance {
 
     public CraftingTickableSound(BlockPos pos) {
-        super(SoundEventRegistry.craftingSound.get(), SoundSource.PLAYERS, SoundInstance.createUnseededRandom());
+        super(SoundEventRegistry.craftingSound.get(), SoundSource.PLAYERS);
         this.looping = true;
         this.delay = 3;
         this.volume = 1.0F;
