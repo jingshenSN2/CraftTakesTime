@@ -180,7 +180,7 @@ public class CraftManager {
     }
 
     private List<Item> getIngredientItems(AbstractContainerMenu handler, SlotRange ingredientSlots) {
-        List<Item> items = new ArrayList<Item>();
+        List<Item> items = new ArrayList<>();
         for (int i : ingredientSlots) {
             items.add(handler.getSlot(i).getItem().getItem());
         }

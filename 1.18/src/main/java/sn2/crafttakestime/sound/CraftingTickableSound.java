@@ -1,7 +1,6 @@
 package sn2.crafttakestime.sound;
 
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import sn2.crafttakestime.core.CraftManager;
