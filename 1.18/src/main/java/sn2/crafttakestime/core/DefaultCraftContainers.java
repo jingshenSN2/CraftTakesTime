@@ -60,6 +60,13 @@ public class DefaultCraftContainers {
                 .overlayX(101)
                 .overlayY(48)
                 .build());
+        // tconstruct crafting station
+        registerCraftContainer(ContainerConfig.builder()
+                .containerName("tconstruct:craftingstation")
+                .guiContainerClassName("slimeknights.tconstruct.tables.client.inventory.CraftingStationScreen")
+                .outputSlot(9)
+                .ingredientSlots(SlotRange.fromString("0-8"))
+                .build());
     }
 
     public static DefaultCraftContainers getInstance() {
