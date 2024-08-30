@@ -21,11 +21,11 @@ version = "${mod_version}" #mandatory
 # A display name for the mod
 displayName = "${mod_name}" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification https://docs.minecraftforge.net/en/latest/misc/updatechecker/
-updateJSONURL="{mod_update_json_url}" #optional
+#updateJSONURL="{mod_update_json_url}" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
 displayURL="${mod_url}" #optional
 # A file name (in the root of the mod JAR) containing a logo for display
-logoFile="${mod_icon}" #optional
+#logoFile="${mod_icon}" #optional
 # A text field displayed in the mod UI
 #credits="Thanks for this example mod goes to Java" #optional
 # A text field displayed in the mod UI
