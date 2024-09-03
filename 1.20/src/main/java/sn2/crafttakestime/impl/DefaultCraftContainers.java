@@ -45,11 +45,11 @@ public class DefaultCraftContainers {
         // minecraft smithing table
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:smithing_table")
-                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.LegacySmithingScreen")
-                .ingredientSlots(SlotRange.fromString("0-1"))
-                .outputSlot(2)
-                .overlayX(101)
-                .overlayY(48)
+                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.SmithingScreen")
+                .ingredientSlots(SlotRange.fromString("0-2"))
+                .outputSlot(3)
+                .overlayX(67)
+                .overlayY(49)
                 .build());
         // minecraft anvil screen
         registerCraftContainer(ContainerConfig.builder()
