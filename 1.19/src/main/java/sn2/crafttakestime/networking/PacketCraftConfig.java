@@ -6,8 +6,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sn2.crafttakestime.config.CraftConfig;
-import sn2.crafttakestime.core.CraftManager;
+import sn2.crafttakestime.common.config.CraftConfig;
+import sn2.crafttakestime.common.core.CraftManager;
 
 import java.util.function.Supplier;
 

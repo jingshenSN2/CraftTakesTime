@@ -1,4 +1,4 @@
-package sn2.crafttakestime.core;
+package sn2.crafttakestime.impl;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;

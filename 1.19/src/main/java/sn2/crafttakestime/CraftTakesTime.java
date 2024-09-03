@@ -2,6 +2,8 @@ package sn2.crafttakestime;
 
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import sn2.crafttakestime.common.core.CraftManager;
+import sn2.crafttakestime.impl.MC119Adapter;
 import sn2.crafttakestime.networking.TimeCraftPacketHandler;
 import sn2.crafttakestime.sound.SoundEventRegistry;
 
@@ -15,5 +17,6 @@ public class CraftTakesTime {
     public CraftTakesTime() {
         TimeCraftPacketHandler.registerMessage();
         SoundEventRegistry.SOUNDS.register(FMLJavaModLoadingContext.get().getModEventBus());
+        CraftManager.getInstance().setMinecraftAdapter(new MC119Adapter());
     }
 }

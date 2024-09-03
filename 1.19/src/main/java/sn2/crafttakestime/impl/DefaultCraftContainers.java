@@ -1,4 +1,4 @@
-package sn2.crafttakestime.core;
+package sn2.crafttakestime.impl;
 
 import lombok.Data;
 import sn2.crafttakestime.common.config.ContainerConfig;

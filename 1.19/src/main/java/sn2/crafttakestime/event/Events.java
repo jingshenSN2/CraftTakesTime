@@ -8,8 +8,7 @@ import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
-import sn2.crafttakestime.config.ConfigLoader;
-import sn2.crafttakestime.core.CraftManager;
+import sn2.crafttakestime.common.core.CraftManager;
 import sn2.crafttakestime.networking.PacketCraftConfig;
 import sn2.crafttakestime.networking.TimeCraftPacketHandler;
 
@@ -18,7 +17,7 @@ public class Events {
 
     @SubscribeEvent
     public static void onServerStarted(ServerStartedEvent event) {
-        ConfigLoader.loadConfig();
+        CraftManager.getInstance().loadConfig();
     }
 
     @SubscribeEvent
