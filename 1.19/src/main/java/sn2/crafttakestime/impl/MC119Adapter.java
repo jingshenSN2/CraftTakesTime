@@ -90,7 +90,8 @@ public class MC119Adapter implements MinecraftAdapter {
         ItemStack outputStack = this.containerScreen.getMenu().getSlot(outputSlot).getItem();
         ItemStack carriedStack = this.containerScreen.getMenu().getCarried();
         return !carriedStack.isEmpty() &&
-                (!outputStack.sameItem(carriedStack) || outputStack.getCount() >= outputStack.getMaxStackSize());
+                (!outputStack.sameItem(carriedStack) ||
+                        outputStack.getCount() + carriedStack.getCount() >= carriedStack.getMaxStackSize());
     }
 
     @Override
