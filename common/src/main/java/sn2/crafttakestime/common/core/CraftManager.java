@@ -174,6 +174,10 @@ public class CraftManager {
         // Ingredient multiplier
         float ingredientDifficulty = 0F;
         for (int idx : ingredientSlots) {
+            if (this.minecraftAdapter.isSlotEmpty(idx)) {
+                // Skip empty slots
+                continue;
+            }
             ItemRegistry registry = this.minecraftAdapter.getSlotItemRegistry(idx);
             if (registry == null) {
                 continue;
