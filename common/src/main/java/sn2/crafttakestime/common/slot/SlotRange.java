@@ -1,12 +1,13 @@
-package sn2.crafttakestime.util;
+package sn2.crafttakestime.common.slot;
 
 import lombok.Builder;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Builder
@@ -14,7 +15,7 @@ import java.util.stream.IntStream;
 public class SlotRange implements Iterable<Integer> {
 
     @Builder.Default
-    private List<Integer> slots = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
+    private List<Integer> slots = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
     public static SlotRange fromString(String range) {
         // Format: 1-9,12,15-18
@@ -25,7 +26,7 @@ public class SlotRange implements Iterable<Integer> {
                 String[] rangeSplit = s.split("-");
                 int start = Integer.parseInt(rangeSplit[0]);
                 int end = Integer.parseInt(rangeSplit[1]);
-                slots.addAll(IntStream.rangeClosed(start, end).boxed().toList());
+                slots.addAll(IntStream.rangeClosed(start, end).boxed().collect(Collectors.toList()));
             } else {
                 slots.add(Integer.parseInt(s));
             }
@@ -66,7 +67,7 @@ public class SlotRange implements Iterable<Integer> {
     }
 
     @Override
-    public @NotNull Iterator<Integer> iterator() {
+    public Iterator<Integer> iterator() {
         return slots.iterator();
     }
 }

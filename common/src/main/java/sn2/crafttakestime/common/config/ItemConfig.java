@@ -1,4 +1,4 @@
-package sn2.crafttakestime.config;
+package sn2.crafttakestime.common.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

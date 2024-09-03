@@ -1,43 +1,27 @@
-package sn2.crafttakestime.core;
+package sn2.crafttakestime.common.core;
 
 import lombok.Data;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import sn2.crafttakestime.ITimeCraftGuiContainer;
-import sn2.crafttakestime.config.ContainerConfig;
-import sn2.crafttakestime.config.CraftConfig;
-import sn2.crafttakestime.sound.CraftingTickableSound;
-import sn2.crafttakestime.sound.SoundEventRegistry;
-import sn2.crafttakestime.util.CraftingSpeedHelper;
-import sn2.crafttakestime.util.SlotRange;
+import lombok.extern.slf4j.Slf4j;
+import sn2.crafttakestime.common.config.ConfigLoader;
+import sn2.crafttakestime.common.config.ContainerConfig;
+import sn2.crafttakestime.common.config.CraftConfig;
+import sn2.crafttakestime.common.slot.SlotRange;
 
-import java.util.ArrayList;
-import java.util.List;
-
+@Slf4j
 @Data
 public class CraftManager {
 
-    private static final Logger log = LogManager.getLogger(CraftManager.class);
     private static final float BASE_CRAFTING_TIME_PER_ITEM = 20F;
     private static final ContainerConfig DISABLED_CONTAINER = ContainerConfig.builder().enabled(false).build();
+
     // Singleton
     private static CraftManager INSTANCE;
+    private MinecraftAdapter minecraftAdapter;
     private CraftConfig config;
-    private AbstractContainerScreen currentGuiContainer;
     private boolean crafting = false;
     private int waitCounter = 0;
     private float currentCraftTime = 0;
     private float craftPeriod = 0;
-    private ItemStack resultStack;
 
     private CraftManager() {
     }
@@ -49,27 +33,37 @@ public class CraftManager {
         return INSTANCE;
     }
 
+    public void loadConfig() {
+        ConfigLoader configLoader = new ConfigLoader(
+                this.minecraftAdapter.getConfigPath(),
+                this.minecraftAdapter.getDefaultsCraftContainers());
+        config = configLoader.loadConfig();
+    }
+
     public void unsetGuiContainer() {
-        this.currentGuiContainer = null;
+        this.minecraftAdapter.setContainerScreen(null);
         this.stopCraft();
     }
 
     public ContainerConfig getCraftContainerConfig() {
-        if (this.currentGuiContainer == null) {
+        Object containerScreen = this.minecraftAdapter.getContainerScreen();
+        if (containerScreen == null) {
             return DISABLED_CONTAINER;
         }
-        String guiClassName = this.currentGuiContainer.getClass().getName();
+        String guiClassName = containerScreen.getClass().getName();
         return config.getContainers().stream().filter(container ->
                         container.getGuiContainerClassName().equals(guiClassName))
                 .findFirst().orElse(DISABLED_CONTAINER);
     }
 
-    public boolean initCraft(AbstractContainerScreen gui, int invSlot) {
-        this.setCurrentGuiContainer(gui);
+    public boolean initCraft(Object gui, int invSlot) {
+        this.minecraftAdapter.setContainerScreen(gui);
         ContainerConfig containerConfig = this.getCraftContainerConfig();
         if (config.isDebug()) {
             log.info("Inv slot {}, gui class {}, containerConfig {}",
-                    invSlot, this.getCurrentGuiContainer().getClass().getName(), containerConfig);
+                    invSlot,
+                    this.minecraftAdapter.getContainerScreen().getClass().getName(),
+                    containerConfig);
         }
 
         if (!containerConfig.isEnabled()) {
@@ -84,21 +78,16 @@ public class CraftManager {
         }
 
         // Check if the result slot is empty
-        if (this.currentGuiContainer.getMenu().getSlot(outputSlot).getItem().isEmpty()) {
+        if (this.minecraftAdapter.isSlotEmpty(outputSlot)) {
             return false;
         }
 
         // Check if the player is already crafting
         if (!isCrafting()) {
-            craftPeriod = getCraftingTime(
-                    this.currentGuiContainer.getMenu(), outputSlot, containerConfig.getIngredientSlots(), containerConfig);
+            craftPeriod = getCraftingTime(outputSlot, containerConfig.getIngredientSlots(), containerConfig);
 
             if (craftPeriod >= 10F && config.isEnableCraftingSound()) {
-                LocalPlayer player = Minecraft.getInstance().player;
-                if (player != null) {
-                    Minecraft.getInstance().getSoundManager().play(
-                            new CraftingTickableSound(player.getOnPos()));
-                }
+                this.minecraftAdapter.playCraftingSound();
             }
             startCraft();
         }
@@ -116,8 +105,7 @@ public class CraftManager {
     }
 
     public void tick() {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player == null) {
+        if (!this.minecraftAdapter.hasPlayer()) {
             return;
         }
 
@@ -130,11 +118,8 @@ public class CraftManager {
             int outputSlot = containerConfig.getOutputSlot();
             SlotRange ingredientSlots = containerConfig.getIngredientSlots();
 
-            ItemStack resultStack = this.currentGuiContainer.getMenu()
-                    .getSlot(outputSlot).getItem();
-
             // Stop crafting if the result slot is empty
-            if (resultStack.isEmpty()) {
+            if (this.minecraftAdapter.isSlotEmpty(outputSlot)) {
                 if (waitCounter < 5) {
                     waitCounter++;
                 } else {
@@ -144,31 +129,26 @@ public class CraftManager {
                 return;
             }
 
-            ItemStack cursorStack = player.inventoryMenu.getCarried();
-            if (cursorStack.getItem() != Items.AIR) {
-                if (!cursorStack.sameItem(resultStack)
-                        || cursorStack.getCount() + resultStack.getCount() > cursorStack.getMaxStackSize()) {
-                    this.stopCraft();
-                    return;
-                }
+            if (this.minecraftAdapter.shouldStopCrafting(outputSlot)) {
+                this.stopCraft();
+                return;
             }
             if (this.getCurrentCraftTime() < this.getCraftPeriod()) {
-                this.currentCraftTime += CraftingSpeedHelper.getCraftingSpeed(player);
+                this.currentCraftTime += this.minecraftAdapter.getCraftingSpeed();
             } else if (this.getCurrentCraftTime() >= this.getCraftPeriod()) {
                 if (config.isEnableCraftingSound()) {
-                    player.playSound(SoundEventRegistry.finishSound.get(), 0.1F, 1f);
+                    this.minecraftAdapter.playFinishSound();
                 }
 
                 // Record the old recipe before picking up the result item
-                List<Item> oldRecipe = getIngredientItems(
-                        this.getCurrentGuiContainer().getMenu(), ingredientSlots);
+                Object oldRecipe = this.minecraftAdapter.getItems(ingredientSlots);
 
-                ((ITimeCraftGuiContainer) this.currentGuiContainer).handleCraftFinished(
-                        this.getCurrentGuiContainer().getMenu().getSlot(outputSlot), outputSlot);
+                // Pick up the result item
+                this.minecraftAdapter.handleCraftFinished(outputSlot);
 
                 // Compare the old recipe with the new recipe
-                List<Item> newRecipe = getIngredientItems(
-                        this.getCurrentGuiContainer().getMenu(), ingredientSlots);
+                Object newRecipe = this.minecraftAdapter.getItems(ingredientSlots);
+
                 if (!oldRecipe.equals(newRecipe)) {
                     this.stopCraft();
                 } else {
@@ -179,21 +159,7 @@ public class CraftManager {
         }
     }
 
-    private List<Item> getIngredientItems(AbstractContainerMenu handler, SlotRange ingredientSlots) {
-        List<Item> items = new ArrayList<Item>();
-        for (int i : ingredientSlots) {
-            items.add(handler.getSlot(i).getItem().getItem());
-        }
-        log.info("Ingredient items: {}", items);
-        return items;
-    }
-
-    private Item getOutputItem(AbstractContainerMenu handler, int outputSlot) {
-        return handler.getSlot(outputSlot).getItem().getItem();
-    }
-
-    private float getCraftingTime(AbstractContainerMenu handler,
-                                  int outputSlot,
+    private float getCraftingTime(int outputSlot,
                                   SlotRange ingredientSlots,
                                   ContainerConfig containerConfig) {
         // Global multiplier
@@ -206,32 +172,27 @@ public class CraftManager {
         }
 
         // Ingredient multiplier
-        List<Item> ingredients = getIngredientItems(handler, ingredientSlots);
         float ingredientDifficulty = 0F;
-        for (Item item : ingredients) {
-            if (item == Items.AIR) {
-                continue;
-            }
-            ResourceLocation registry = ForgeRegistries.ITEMS.getKey(item);
+        for (int idx : ingredientSlots) {
+            ItemRegistry registry = this.minecraftAdapter.getSlotItemRegistry(idx);
             if (registry == null) {
                 continue;
             }
             float modMultiplier = config.getIngredientConfig().getModCraftingTimeMultipliers()
-                    .getOrDefault(registry.getNamespace(), 1F);
+                    .getOrDefault(registry.getModId(), 1F);
             float itemMultiplier = config.getIngredientConfig().getItemCraftingTimeMultipliers()
-                    .getOrDefault(registry.toString(), 1F);
+                    .getOrDefault(registry.getName(), 1F);
             ingredientDifficulty += modMultiplier * itemMultiplier;
         }
 
         // Output multiplier
-        Item outputItem = getOutputItem(handler, outputSlot);
-        ResourceLocation outputRegistry = ForgeRegistries.ITEMS.getKey(outputItem);
+        ItemRegistry outputRegistry = this.minecraftAdapter.getSlotItemRegistry(outputSlot);
         float outputMultiplier = 1F;
         if (outputRegistry != null) {
             float modMultiplier = config.getOutputConfig().getModCraftingTimeMultipliers()
-                    .getOrDefault(outputRegistry.getNamespace(), 1F);
+                    .getOrDefault(outputRegistry.getModId(), 1F);
             float itemMultiplier = config.getOutputConfig().getItemCraftingTimeMultipliers()
-                    .getOrDefault(outputRegistry.toString(), 1F);
+                    .getOrDefault(outputRegistry.getName(), 1F);
             outputMultiplier = modMultiplier * itemMultiplier;
         }
 

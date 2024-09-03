@@ -1,4 +1,4 @@
-package sn2.crafttakestime.util;
+package sn2.crafttakestime.common.slot;
 
 import com.google.gson.*;
 

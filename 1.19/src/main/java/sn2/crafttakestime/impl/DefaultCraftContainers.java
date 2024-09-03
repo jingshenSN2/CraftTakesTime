@@ -1,8 +1,8 @@
 package sn2.crafttakestime.core;
 
 import lombok.Data;
-import sn2.crafttakestime.config.ContainerConfig;
-import sn2.crafttakestime.util.SlotRange;
+import sn2.crafttakestime.common.config.ContainerConfig;
+import sn2.crafttakestime.common.slot.SlotRange;
 
 import java.util.ArrayList;
 import java.util.List;

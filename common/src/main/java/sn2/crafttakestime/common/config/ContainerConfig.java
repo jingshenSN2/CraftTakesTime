@@ -1,9 +1,9 @@
-package sn2.crafttakestime.config;
+package sn2.crafttakestime.common.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import sn2.crafttakestime.util.SlotRange;
+import sn2.crafttakestime.common.slot.SlotRange;
 
 @Data
 @Builder
