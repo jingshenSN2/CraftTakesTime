@@ -7,8 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
-import sn2.crafttakestime.config.ConfigLoader;
-import sn2.crafttakestime.core.CraftManager;
+import sn2.crafttakestime.common.core.CraftManager;
 import sn2.crafttakestime.networking.PacketCraftConfig;
 import sn2.crafttakestime.networking.TimeCraftPacketHandler;
 
@@ -18,7 +17,7 @@ public class Events {
     @SubscribeEvent
     public static void onWorldLoad(Load event) {
         if (!event.getWorld().isRemote) {
-            ConfigLoader.loadConfig();
+            CraftManager.getInstance().loadConfig();
         }
     }
 

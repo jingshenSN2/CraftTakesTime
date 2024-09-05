@@ -1,16 +1,17 @@
 package sn2.crafttakestime.common.core;
 
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sn2.crafttakestime.common.config.ConfigLoader;
 import sn2.crafttakestime.common.config.ContainerConfig;
 import sn2.crafttakestime.common.config.CraftConfig;
 import sn2.crafttakestime.common.slot.SlotRange;
 
-@Slf4j
 @Data
 public class CraftManager {
 
+    private static final Logger log = LogManager.getLogger(CraftManager.class);
     private static final float BASE_CRAFTING_TIME_PER_ITEM = 20F;
     private static final ContainerConfig DISABLED_CONTAINER = ContainerConfig.builder().enabled(false).build();
 

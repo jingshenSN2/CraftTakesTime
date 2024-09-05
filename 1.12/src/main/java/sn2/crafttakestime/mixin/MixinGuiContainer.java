@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import sn2.crafttakestime.ITimeCraftGuiContainer;
-import sn2.crafttakestime.config.ContainerConfig;
-import sn2.crafttakestime.core.CraftManager;
+import sn2.crafttakestime.common.config.ContainerConfig;
+import sn2.crafttakestime.common.core.CraftManager;
 
 @Mixin(GuiContainer.class)
 public abstract class MixinGuiContainer extends GuiScreen implements ITimeCraftGuiContainer {

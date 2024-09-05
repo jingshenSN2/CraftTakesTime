@@ -9,8 +9,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sn2.crafttakestime.config.CraftConfig;
-import sn2.crafttakestime.core.CraftManager;
+import sn2.crafttakestime.common.config.CraftConfig;
+import sn2.crafttakestime.common.core.CraftManager;
 
 @Data
 public class PacketCraftConfig implements IMessage {

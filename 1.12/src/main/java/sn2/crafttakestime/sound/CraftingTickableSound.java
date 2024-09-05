@@ -3,7 +3,7 @@ package sn2.crafttakestime.sound;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import sn2.crafttakestime.core.CraftManager;
+import sn2.crafttakestime.common.core.CraftManager;
 
 public class CraftingTickableSound extends MovingSound {
 

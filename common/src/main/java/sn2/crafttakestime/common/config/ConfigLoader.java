@@ -3,7 +3,8 @@ package sn2.crafttakestime.common.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import sn2.crafttakestime.common.slot.SlotRange;
 import sn2.crafttakestime.common.slot.SlotRangeAdapter;
 
@@ -15,11 +16,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 public class ConfigLoader {
-
     public static final String CONFIG_FILENAME = "craft_time_config.json";
+    private static final Logger log = LogManager.getLogger(ConfigLoader.class);
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(SlotRange.class, new SlotRangeAdapter())
             .setPrettyPrinting()

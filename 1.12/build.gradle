@@ -61,6 +61,8 @@ dependencies {
         exclude module: 'gson'
     }
 
+    implementation project(':common')
+
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.spongepowered:mixin:0.8.3-SNAPSHOT:processor'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
@@ -87,6 +89,9 @@ processResources {
 
 sourceSets {
     main {
+        java {
+            srcDir '../common/src'
+        }
         resources {
             srcDir 'resources'
         }
