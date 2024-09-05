@@ -6,11 +6,13 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+import static sn2.crafttakestime.CraftTakesTime.MODID;
+
 public class SoundEventRegistry {
 
-    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, "crafttakestime");
+    public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
     public static RegistryObject<SoundEvent> craftingSound = SOUNDS.register("crafting", () ->
-            new SoundEvent(new ResourceLocation("crafttakestime", "crafting")));
+            new SoundEvent(new ResourceLocation(MODID, "crafting")));
     public static RegistryObject<SoundEvent> finishSound = SOUNDS.register("finish", () ->
-            new SoundEvent(new ResourceLocation("crafttakestime", "finish")));
+            new SoundEvent(new ResourceLocation(MODID, "finish")));
 }
