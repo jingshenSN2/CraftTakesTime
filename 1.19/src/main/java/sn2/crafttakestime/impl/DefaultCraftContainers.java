@@ -45,7 +45,7 @@ public class DefaultCraftContainers {
         // minecraft smithing table
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:smithing_table")
-                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.LegacySmithingScreen")
+                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.SmithingScreen")
                 .ingredientSlots(SlotRange.fromString("0-1"))
                 .outputSlot(2)
                 .overlayX(101)
@@ -59,6 +59,13 @@ public class DefaultCraftContainers {
                 .outputSlot(2)
                 .overlayX(101)
                 .overlayY(48)
+                .build());
+        // tinker's crafting station
+        registerCraftContainer(ContainerConfig.builder()
+                .containerName("tconstruct:crafting_station")
+                .guiContainerClassName("slimeknights.tconstruct.tables.client.inventory.CraftingStationScreen")
+                .ingredientSlots(SlotRange.fromString("0-8"))
+                .outputSlot(9)
                 .build());
     }
 
