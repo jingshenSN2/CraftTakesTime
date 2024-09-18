@@ -18,7 +18,7 @@ public class DefaultCraftContainers {
         // minecraft inventory
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:inventory")
-                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.InventoryScreen")
+                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.InventoryScreen")
                 .ingredientSlots(SlotRange.fromString("1-4"))
                 .overlayTexture("crafttakestime:textures/gui/crafting_overlay_inventory.png")
                 .overlayX(134)
@@ -40,12 +40,12 @@ public class DefaultCraftContainers {
         // minecraft crafting table
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:crafting_table")
-                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.CraftingScreen")
+                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.CraftingScreen")
                 .build());
         // minecraft smithing table
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:smithing_table")
-                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.SmithingScreen")
+                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.SmithingScreen")
                 .ingredientSlots(SlotRange.fromString("0-2"))
                 .outputSlot(3)
                 .overlayX(67)
@@ -54,7 +54,7 @@ public class DefaultCraftContainers {
         // minecraft anvil screen
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:anvil")
-                .guiContainerClassName("net.minecraft.client.gui.screens.inventory.AnvilScreen")
+                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.AnvilScreen")
                 .ingredientSlots(SlotRange.fromString("0-1"))
                 .outputSlot(2)
                 .overlayX(101)
