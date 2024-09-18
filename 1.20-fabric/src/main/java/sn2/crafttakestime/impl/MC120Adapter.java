@@ -91,7 +91,7 @@ public class MC120Adapter implements MinecraftAdapter {
         ItemStack carriedStack = this.containerScreen.getScreenHandler().getCursorStack();
         return !carriedStack.isEmpty() &&
                 (!ItemStack.areItemsEqual(outputStack, carriedStack) ||
-                        outputStack.getCount() + carriedStack.getCount() >= carriedStack.getMaxCount());
+                        outputStack.getCount() + carriedStack.getCount() > carriedStack.getMaxCount());
     }
 
     @Override
