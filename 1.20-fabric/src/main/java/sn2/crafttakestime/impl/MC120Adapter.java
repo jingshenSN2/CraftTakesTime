@@ -14,6 +14,8 @@ import sn2.crafttakestime.common.core.ItemRegistry;
 import sn2.crafttakestime.common.core.MinecraftAdapter;
 import sn2.crafttakestime.common.player.CraftingSpeedHelper;
 import sn2.crafttakestime.common.slot.SlotRange;
+import sn2.crafttakestime.sound.CraftingTickableSound;
+import sn2.crafttakestime.sound.SoundEventRegistry;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -88,7 +90,7 @@ public class MC120Adapter implements MinecraftAdapter {
         ItemStack outputStack = this.containerScreen.getScreenHandler().getSlot(outputSlot).getStack();
         ItemStack carriedStack = this.containerScreen.getScreenHandler().getCursorStack();
         return !carriedStack.isEmpty() &&
-                (!ItemStack.areEqual(outputStack, carriedStack) ||
+                (!ItemStack.areItemsEqual(outputStack, carriedStack) ||
                         outputStack.getCount() + carriedStack.getCount() >= carriedStack.getMaxCount());
     }
 
@@ -109,19 +111,19 @@ public class MC120Adapter implements MinecraftAdapter {
 
     @Override
     public void playCraftingSound() {
-//        LocalPlayer player = Minecraft.getInstance().player;
-//        if (player != null) {
-//            Minecraft.getInstance().getSoundManager().play(
-//                    new CraftingTickableSound(player.getOnPos()));
-//        }
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player != null) {
+            MinecraftClient.getInstance().getSoundManager().play(
+                    new CraftingTickableSound(player.getBlockPos()));
+        }
     }
 
     @Override
     public void playFinishSound() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
-//        if (player != null) {
-//            player.playSound(SoundEventRegistry.finishSound.get(), 0.1F, 1f);
-//        }
+        if (player != null) {
+            player.playSound(SoundEventRegistry.finishSound, 0.1F, 1f);
+        }
     }
 
     @Override
