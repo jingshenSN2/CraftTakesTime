@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "crafttakestime",
+  "version": "${version}",
+  "name": "Craft Takes Time",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/crafttakestime/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "sn2.crafttakestime.client.CraftTakesTimeClient"
+    ],
+    "main": [
+      "sn2.crafttakestime.CraftTakesTime"
+    ]
+  },
+  "mixins": [
+    "crafttakestime.mixins.json",
+    {
+      "config": "crafttakestime.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
