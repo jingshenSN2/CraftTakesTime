@@ -10,19 +10,12 @@
   "icon": "assets/crafttakestime/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      "sn2.crafttakestime.client.CraftTakesTimeClient"
-    ],
     "main": [
       "sn2.crafttakestime.CraftTakesTime"
     ]
   },
   "mixins": [
-    "crafttakestime.mixins.json",
-    {
-      "config": "crafttakestime.client.mixins.json",
-      "environment": "client"
-    }
+    "crafttakestime.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=${loader_version}",
