@@ -12,5 +12,6 @@ public class CraftTakesTime implements ModInitializer {
     @Override
     public void onInitialize() {
         CraftManager.getInstance().setMinecraftAdapter(new MC120Adapter());
+        CraftManager.getInstance().loadConfig();
     }
 }

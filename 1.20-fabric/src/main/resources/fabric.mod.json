@@ -12,6 +12,9 @@
   "entrypoints": {
     "main": [
       "sn2.crafttakestime.CraftTakesTime"
+    ],
+    "client": [
+      "sn2.crafttakestime.CraftTakesTimeClient"
     ]
   },
   "mixins": [

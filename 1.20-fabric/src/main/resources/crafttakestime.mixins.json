@@ -4,6 +4,7 @@
   "package": "sn2.crafttakestime.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "MixinPlayerManager"
   ],
   "injectors": {
     "defaultRequire": 1

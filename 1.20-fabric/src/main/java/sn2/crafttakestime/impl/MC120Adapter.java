@@ -14,8 +14,6 @@ import sn2.crafttakestime.common.core.ItemRegistry;
 import sn2.crafttakestime.common.core.MinecraftAdapter;
 import sn2.crafttakestime.common.player.CraftingSpeedHelper;
 import sn2.crafttakestime.common.slot.SlotRange;
-//import sn2.crafttakestime.sound.CraftingTickableSound;
-//import sn2.crafttakestime.sound.SoundEventRegistry;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ public class MC120Adapter implements MinecraftAdapter {
 
     @Override
     public Path getConfigPath() {
-        return  FabricLoader.getInstance().getConfigDir().resolve(MODID);
+        return FabricLoader.getInstance().getConfigDir().resolve(MODID);
     }
 
     @Override
