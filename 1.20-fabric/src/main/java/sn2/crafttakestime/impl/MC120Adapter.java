@@ -2,12 +2,12 @@ package sn2.crafttakestime.impl;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
-import net.minecraft.screen.AbstractRecipeScreenHandler;
 import sn2.crafttakestime.ITimeCraftGuiContainer;
 import sn2.crafttakestime.common.config.ContainerConfig;
 import sn2.crafttakestime.common.core.ItemRegistry;
@@ -22,7 +22,7 @@ import java.util.List;
 import static sn2.crafttakestime.CraftTakesTime.MODID;
 
 public class MC120Adapter implements MinecraftAdapter {
-    private AbstractRecipeScreenHandler containerScreen;
+    private HandledScreen containerScreen;
 
     @Override
     public Path getConfigPath() {
@@ -41,7 +41,7 @@ public class MC120Adapter implements MinecraftAdapter {
 
     @Override
     public void setContainerScreen(Object screen) {
-        this.containerScreen = (AbstractRecipeScreenHandler) screen;
+        this.containerScreen = (HandledScreen) screen;
     }
 
     @Override
@@ -51,7 +51,7 @@ public class MC120Adapter implements MinecraftAdapter {
             return items;
         }
         for (int i : range) {
-            items.add(this.containerScreen.getSlot(i).getStack().getItem());
+            items.add(this.containerScreen.getScreenHandler().getSlot(i).getStack().getItem());
         }
         return items;
     }
@@ -61,7 +61,7 @@ public class MC120Adapter implements MinecraftAdapter {
         if (this.containerScreen == null) {
             return true;
         }
-        return this.containerScreen.getSlot(slotIndex).getStack().isEmpty();
+        return this.containerScreen.getScreenHandler().getSlot(slotIndex).getStack().isEmpty();
     }
 
     @Override
@@ -69,7 +69,7 @@ public class MC120Adapter implements MinecraftAdapter {
         if (this.containerScreen == null) {
             return null;
         }
-        Item item = this.containerScreen.getSlot(slotIndex).getStack().getItem();
+        Item item = this.containerScreen.getScreenHandler().getSlot(slotIndex).getStack().getItem();
         RegistryKey<Item> resourceLocation = Registries.ITEM.getKey(item).orElse(null);
         if (resourceLocation != null) {
             return ItemRegistry.builder()
@@ -85,8 +85,8 @@ public class MC120Adapter implements MinecraftAdapter {
         if (this.containerScreen == null) {
             return true;
         }
-        ItemStack outputStack = this.containerScreen.getSlot(outputSlot).getStack();
-        ItemStack carriedStack = this.containerScreen.getCursorStack();
+        ItemStack outputStack = this.containerScreen.getScreenHandler().getSlot(outputSlot).getStack();
+        ItemStack carriedStack = this.containerScreen.getScreenHandler().getCursorStack();
         return !carriedStack.isEmpty() &&
                 (!ItemStack.areEqual(outputStack, carriedStack) ||
                         outputStack.getCount() + carriedStack.getCount() >= carriedStack.getMaxCount());
@@ -98,7 +98,7 @@ public class MC120Adapter implements MinecraftAdapter {
             return;
         }
         ((ITimeCraftGuiContainer) this.containerScreen).handleCraftFinished(
-                this.containerScreen.getSlot(outputSlot), outputSlot);
+                this.containerScreen.getScreenHandler().getSlot(outputSlot), outputSlot);
     }
 
     @Override
