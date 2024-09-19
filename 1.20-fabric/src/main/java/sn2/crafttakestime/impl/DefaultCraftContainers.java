@@ -1,6 +1,10 @@
 package sn2.crafttakestime.impl;
 
 import lombok.Data;
+import net.minecraft.client.gui.screen.ingame.AnvilScreen;
+import net.minecraft.client.gui.screen.ingame.CraftingScreen;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.client.gui.screen.ingame.SmithingScreen;
 import sn2.crafttakestime.common.config.ContainerConfig;
 import sn2.crafttakestime.common.slot.SlotRange;
 
@@ -18,7 +22,7 @@ public class DefaultCraftContainers {
         // minecraft inventory
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:inventory")
-                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.InventoryScreen")
+                .guiContainerClassName(InventoryScreen.class.getName())
                 .ingredientSlots(SlotRange.fromString("1-4"))
                 .overlayTexture("crafttakestime:textures/gui/crafting_overlay_inventory.png")
                 .overlayX(134)
@@ -40,12 +44,12 @@ public class DefaultCraftContainers {
         // minecraft crafting table
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:crafting_table")
-                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.CraftingScreen")
+                .guiContainerClassName(CraftingScreen.class.getName())
                 .build());
         // minecraft smithing table
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:smithing_table")
-                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.SmithingScreen")
+                .guiContainerClassName(SmithingScreen.class.getName())
                 .ingredientSlots(SlotRange.fromString("0-2"))
                 .outputSlot(3)
                 .overlayX(67)
@@ -54,7 +58,7 @@ public class DefaultCraftContainers {
         // minecraft anvil screen
         registerCraftContainer(ContainerConfig.builder()
                 .containerName("minecraft:anvil")
-                .guiContainerClassName("net.minecraft.client.gui.screen.ingame.AnvilScreen")
+                .guiContainerClassName(AnvilScreen.class.getName())
                 .ingredientSlots(SlotRange.fromString("0-1"))
                 .outputSlot(2)
                 .overlayX(101)

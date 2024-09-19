@@ -17,6 +17,10 @@ public interface MinecraftAdapter {
 
     void setContainerScreen(Object screen);
 
+    default String getContainerScreenClassName() {
+        return this.getContainerScreen().getClass().getName();
+    }
+
     // Slot related
     Object getItems(SlotRange range);
 

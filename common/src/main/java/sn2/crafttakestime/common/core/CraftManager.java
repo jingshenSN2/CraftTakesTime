@@ -51,7 +51,7 @@ public class CraftManager {
         if (containerScreen == null) {
             return DISABLED_CONTAINER;
         }
-        String guiClassName = containerScreen.getClass().getName();
+        String guiClassName = this.minecraftAdapter.getContainerScreenClassName();
         return config.getContainers().stream().filter(container ->
                         container.getGuiContainerClassName().equals(guiClassName))
                 .findFirst().orElse(DISABLED_CONTAINER);
@@ -63,7 +63,7 @@ public class CraftManager {
         if (config.isDebug()) {
             log.info("Inv slot {}, gui class {}, containerConfig {}",
                     invSlot,
-                    this.minecraftAdapter.getContainerScreen().getClass().getName(),
+                    this.minecraftAdapter.getContainerScreenClassName(),
                     containerConfig);
         }
 
