@@ -91,7 +91,7 @@ public class MC112Adapter implements MinecraftAdapter {
         ItemStack carriedStack = this.containerScreen.mc.player.inventory.getItemStack();
         return !carriedStack.isEmpty() &&
                 (!outputStack.isItemEqual(carriedStack) ||
-                        outputStack.getCount() + carriedStack.getCount() >= carriedStack.getMaxStackSize());
+                        outputStack.getCount() + carriedStack.getCount() > carriedStack.getMaxStackSize());
     }
 
     @Override
