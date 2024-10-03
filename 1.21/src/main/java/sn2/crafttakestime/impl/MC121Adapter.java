@@ -25,7 +25,7 @@ import java.util.List;
 
 import static sn2.crafttakestime.CraftTakesTime.MODID;
 
-public class MC120Adapter implements MinecraftAdapter {
+public class MC121Adapter implements MinecraftAdapter {
     private AbstractContainerScreen containerScreen;
 
     @Override

@@ -62,8 +62,8 @@ public abstract class MixinContainerScreen<T extends AbstractContainerMenu> exte
 
             // Draw the crafting overlay
             if (containerConfig.isDrawCraftingOverlay() && manager.getCraftPeriod() > 0) {
-                String[] namespaceAndPath = containerConfig.getOverlayTexture().split(":");
-                ResourceLocation craftOverlay = new ResourceLocation(namespaceAndPath[0], namespaceAndPath[1]);
+                ResourceLocation craftOverlay = ResourceLocation.bySeparator(
+                        containerConfig.getOverlayTexture(), ':');
                 float percentage = manager.getCurrentCraftTime() / manager.getCraftPeriod();
                 int progressWidth = (int) (percentage * containerConfig.getOverlayWidth());
                 guiGraphics.blit(

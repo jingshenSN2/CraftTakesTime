@@ -12,7 +12,7 @@ public class SoundEventRegistry {
 
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, MODID);
     public static RegistryObject<SoundEvent> craftingSound = SOUNDS.register("crafting", () ->
-            SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, "crafting")));
+            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "crafting")));
     public static RegistryObject<SoundEvent> finishSound = SOUNDS.register("finish", () ->
-            SoundEvent.createVariableRangeEvent(new ResourceLocation(MODID, "finish")));
+            SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MODID, "finish")));
 }
