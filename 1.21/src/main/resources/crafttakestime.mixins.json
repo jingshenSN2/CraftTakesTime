@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "sn2.crafttakestime.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "crafttakestime.refmap.json",
+  "mixins": [
+    "MixinContainerScreen"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
