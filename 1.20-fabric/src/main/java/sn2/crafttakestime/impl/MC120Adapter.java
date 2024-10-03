@@ -1,5 +1,7 @@
 package sn2.crafttakestime.impl;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -104,12 +106,14 @@ public class MC120Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public boolean hasPlayer() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         return player != null;
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void playCraftingSound() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
@@ -119,6 +123,7 @@ public class MC120Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public void playFinishSound() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
@@ -127,6 +132,7 @@ public class MC120Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @Environment(EnvType.CLIENT)
     public float getCraftingSpeed() {
         ClientPlayerEntity player = MinecraftClient.getInstance().player;
         if (player != null) {
