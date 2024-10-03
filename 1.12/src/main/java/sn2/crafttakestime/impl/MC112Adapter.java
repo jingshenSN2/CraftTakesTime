@@ -8,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import sn2.crafttakestime.ITimeCraftGuiContainer;
 import sn2.crafttakestime.common.config.ContainerConfig;
 import sn2.crafttakestime.common.core.ItemRegistry;
@@ -104,12 +106,14 @@ public class MC112Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public boolean hasPlayer() {
         EntityPlayer player = Minecraft.getMinecraft().player;
         return player != null;
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void playCraftingSound() {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player != null) {
@@ -119,6 +123,7 @@ public class MC112Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public void playFinishSound() {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player != null) {
@@ -127,6 +132,7 @@ public class MC112Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @SideOnly(Side.CLIENT)
     public float getCraftingSpeed() {
         EntityPlayer player = Minecraft.getMinecraft().player;
         if (player != null) {
