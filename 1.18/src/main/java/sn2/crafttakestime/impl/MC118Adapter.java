@@ -6,6 +6,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import sn2.crafttakestime.ITimeCraftGuiContainer;
@@ -104,12 +106,14 @@ public class MC118Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public boolean hasPlayer() {
         LocalPlayer player = Minecraft.getInstance().player;
         return player != null;
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void playCraftingSound() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
@@ -119,6 +123,7 @@ public class MC118Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public void playFinishSound() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
@@ -127,6 +132,7 @@ public class MC118Adapter implements MinecraftAdapter {
     }
 
     @Override
+    @OnlyIn(Dist.CLIENT)
     public float getCraftingSpeed() {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null) {
