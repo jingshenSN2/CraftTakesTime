@@ -1,0 +1,18 @@
+{
+  "crafting": {
+    "subtitle": "subtitles.crafttakestime.crafting",
+    "sounds": [
+      {
+        "name": "crafttakestime:crafting"
+      }
+    ]
+  },
+  "finish": {
+    "subtitle": "subtitles.crafttakestime.finish",
+    "sounds": [
+      {
+        "name": "crafttakestime:finish"
+      }
+    ]
+  }
+}
