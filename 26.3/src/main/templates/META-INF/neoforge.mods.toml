@@ -1,10 +1,11 @@
+issueTrackerURL="https://github.com/jingshenSN2/CraftTakesTime/issues"
 license="All Rights Reserved"
 [[mods]]
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="jingshenSN2"
-displayURL="https://github.com/jingshenSN2/CraftTakesTime"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/craft-time"
 iconFile="assets/crafttakestime/icon.png"
 description='''Server-controlled crafting time, with configurable ingredient/output multipliers and experience bonuses.'''
 [[mixins]]

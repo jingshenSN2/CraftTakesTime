@@ -1,11 +1,11 @@
 # Craft Takes Time — NeoForge 26.3
 
-针对 Minecraft **26.3**、NeoForge **26.3.0.95**、Java **25** 的可试玩开发版，版本号 `2.0.0-alpha.1`。保留 CraftTakesTime 的耗时规则与音效，由服务端管理制作任务。
+针对 Minecraft **26.3**、NeoForge **26.3.0.95**、Java **25** 的 Beta 版，版本号 `2.0.0-beta.1`。保留 CraftTakesTime 的耗时规则与音效，由服务端管理制作任务。
 
 ## 安装与操作
 
 1. 使用 Minecraft 26.3 和 NeoForge 26.3.0.95。
-2. 将 `build/libs/crafttakestime-2.0.0-alpha.1.jar` 放入实例的 `mods` 文件夹；联机时客户端和服务端均安装。
+2. 将 `build/libs/crafttakestime-neoforge-26.3-2.0.0-beta.1.jar` 放入实例的 `mods` 文件夹；联机时客户端和服务端均安装。
 3. 在背包、工作台、铁砧、锻造台或切石机中准备配方。
 4. 左键或右键点击结果：等待后获得一次完整配方的产物，放到鼠标。
 5. Shift 点击结果：逐次等待，将产物放入背包；原料不足、背包满、配方改变时结束。

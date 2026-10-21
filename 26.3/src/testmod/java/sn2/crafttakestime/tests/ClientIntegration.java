@@ -42,9 +42,10 @@ public final class ClientIntegration {
             var uuid = mc.player.getUUID();
             mc.getSingleplayerServer().execute(() -> {
                 var p = mc.getSingleplayerServer().getPlayerList().getPlayer(uuid);
-                p.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
+                p.setGameMode(GameType.SURVIVAL);
                 p.getAbilities().invulnerable = true; p.setNoGravity(true); p.experienceLevel = 0;
                 p.getInventory().clearContent();
+                p.inventoryMenu.setCarried(ItemStack.EMPTY);
                 CraftTakesTime.CONFIG.globalCraftingTimeMultiplier = 3;
                 p.inventoryMenu.getSlot(1).set(new ItemStack(Items.OAK_LOG, 2));
                 p.inventoryMenu.slotsChanged(p.inventoryMenu.getSlot(1).container);
@@ -57,6 +58,8 @@ public final class ClientIntegration {
             mc.gui.setScreen(new InventoryScreen(mc.player));
             phase = 4; wait = 0;
         } else if (phase == 4 && ++wait >= 20) {
+            if (mc.player.containerMenu != mc.player.inventoryMenu || !(mc.gui.screen() instanceof InventoryScreen))
+                throw new IllegalStateException("Test fixture must use the survival inventory menu");
             mc.gameMode.handleContainerInput(0, 0, 0, ContainerInput.PICKUP, mc.player);
             if (!mc.player.inventoryMenu.getCarried().isEmpty()) throw new IllegalStateException("Client predicted immediate crafting");
             phase = 2;

@@ -6,7 +6,7 @@ plugins {
 
 version = mod_version
 group = mod_group_id
-base.archivesName = mod_id
+base.archivesName = "${mod_id}-neoforge-${minecraft_version}"
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 neoForge {
@@ -57,3 +57,9 @@ neoForge.mods {
 tasks.named('check') { dependsOn tasks.named('testmodClasses') }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
 idea.module.downloadSources = true
+
+// Keep identical source revisions reproducible for release checksum verification.
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}

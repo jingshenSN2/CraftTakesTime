@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="All Rights Reserved"
+[[mods]]
+modId="crafttakestime_tests"
+version="1"
+displayName="Craft Takes Time Development Tests"
