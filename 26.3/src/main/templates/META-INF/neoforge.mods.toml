@@ -1,0 +1,24 @@
+issueTrackerURL="https://github.com/jingshenSN2/CraftTakesTime/issues"
+license="All Rights Reserved"
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="jingshenSN2"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/craft-time"
+iconFile="assets/crafttakestime/icon.png"
+description='''Server-controlled crafting time, with configurable ingredient/output multipliers and experience bonuses.'''
+[[mixins]]
+config="crafttakestime.mixins.json"
+[[dependencies.crafttakestime]]
+modId="neoforge"
+type="required"
+versionRange="[26.3.0.95,26.4)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.crafttakestime]]
+modId="minecraft"
+type="required"
+versionRange="[26.3]"
+ordering="NONE"
+side="BOTH"

@@ -1,0 +1,65 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.148'
+    id 'idea'
+}
+
+version = mod_version
+group = mod_group_id
+base.archivesName = "${mod_id}-neoforge-${minecraft_version}"
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+            if (providers.gradleProperty('clientSmoke').isPresent()) {
+                systemProperty 'crafttakestime.clientSmoke', 'true'
+            }
+            if (providers.gradleProperty('clientIntegration').isPresent()) {
+                systemProperty 'crafttakestime.clientIntegration', 'true'
+                programArguments.addAll '--quickPlaySingleplayer', 'CTTValidation'
+            }
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'crafttakestime_tests'
+        }
+        configureEach { logLevel = org.slf4j.event.Level.INFO }
+    }
+    mods {
+        crafttakestime { sourceSet sourceSets.main }
+    }
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var properties = [mod_id: mod_id, mod_name: mod_name, mod_version: mod_version]
+    inputs.properties properties
+    expand properties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+// The development test mod is compiled and loaded by local runs, never packaged in the release JAR.
+sourceSets { testmod }
+sourceSets.testmod.compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath
+sourceSets.testmod.runtimeClasspath += sourceSets.main.output + sourceSets.main.runtimeClasspath
+neoForge.mods {
+    crafttakestime_tests { sourceSet sourceSets.testmod }
+}
+tasks.named('check') { dependsOn tasks.named('testmodClasses') }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+idea.module.downloadSources = true
+
+// Keep identical source revisions reproducible for release checksum verification.
+tasks.withType(AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
