@@ -1,0 +1,11 @@
+{
+  "values": {
+    "minecraft:player": {
+      "global_multiplier": 1.0,
+      "inventory_multiplier": 1.0,
+      "crafting_sound": true,
+      "ingredient_mod_multipliers": {},
+      "output_mod_multipliers": {}
+    }
+  }
+}

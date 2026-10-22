@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
-import sn2.crafttakestime.CraftTakesTime;
+import sn2.crafttakestime.data.CraftingData;
 import sn2.crafttakestime.api.CraftingAdapter;
 import sn2.crafttakestime.api.CraftingAdapters;
 import sn2.crafttakestime.network.ProgressPayload;
@@ -27,14 +27,15 @@ public final class CraftJobs {
         final ItemStack cursor;
         final boolean repeat;
         final int total;
+        final long dataRevision;
         int elapsed;
         Job(ServerPlayer player, AbstractContainerMenu menu, CraftingAdapter adapter, boolean repeat) {
             this.menu = menu; this.adapter = adapter; this.repeat = repeat;
             inputs = adapter.inputs(menu).stream().map(ItemStack::copy).toList();
             output = menu.getSlot(adapter.resultSlot(menu)).getItem().copy();
             cursor = menu.getCarried().copy();
-            total = CraftTakesTime.CONFIG.ticks(inputs, output, adapter.menuId(menu), player.experienceLevel,
-                player.getAttributeValue(CraftTakesTime.CRAFTING_SPEED));
+            dataRevision = CraftingData.revision();
+            total = CraftingData.ticks(player, menu, inputs, output);
         }
     }
     private CraftJobs() {}
@@ -77,7 +78,7 @@ public final class CraftJobs {
         return true;
     }
     private static boolean valid(ServerPlayer player, Job job) {
-        return player.isAlive() && !player.isSpectator() && player.containerMenu == job.menu && job.menu.stillValid(player)
+        return job.dataRevision == CraftingData.revision() && player.isAlive() && !player.isSpectator() && player.containerMenu == job.menu && job.menu.stillValid(player)
             && job.adapter.canCraft(player, job.menu) && same(job.inputs, job.adapter.inputs(job.menu), true)
             && ItemStack.matches(job.output, job.menu.getSlot(job.adapter.resultSlot(job.menu)).getItem())
             && ItemStack.matches(job.cursor, job.menu.getCarried()) && canReceive(player, job);
@@ -120,7 +121,7 @@ public final class CraftJobs {
         }
         job.menu.broadcastChanges();
         PacketDistributor.sendToPlayer(player, new ProgressPayload(job.menu.containerId, job.adapter.resultSlot(job.menu),
-            job.total, 0, success && CraftTakesTime.CONFIG.enableCraftingSound));
+            job.total, 0, success && CraftingData.settings(player).craftingSound()));
         if (job.repeat && success && player.containerMenu == job.menu
                 && same(job.inputs, job.adapter.inputs(job.menu), false)
                 && ItemStack.matches(job.output, job.menu.getSlot(job.adapter.resultSlot(job.menu)).getItem())) {
@@ -130,7 +131,7 @@ public final class CraftJobs {
     }
     private static void sync(ServerPlayer player, Job job) {
         PacketDistributor.sendToPlayer(player, new ProgressPayload(job.menu.containerId, job.adapter.resultSlot(job.menu),
-            job.elapsed, job.total, CraftTakesTime.CONFIG.enableCraftingSound));
+            job.elapsed, job.total, CraftingData.settings(player).craftingSound()));
     }
     private static void cancel(ServerPlayer player) {
         Job old = JOBS.remove(player.getUUID());

@@ -46,7 +46,6 @@ public final class ClientIntegration {
                 p.getAbilities().invulnerable = true; p.setNoGravity(true); p.experienceLevel = 0;
                 p.getInventory().clearContent();
                 p.inventoryMenu.setCarried(ItemStack.EMPTY);
-                CraftTakesTime.CONFIG.globalCraftingTimeMultiplier = 3;
                 p.inventoryMenu.getSlot(1).set(new ItemStack(Items.OAK_LOG, 2));
                 p.inventoryMenu.slotsChanged(p.inventoryMenu.getSlot(1).container);
                 p.inventoryMenu.broadcastChanges();

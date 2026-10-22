@@ -11,20 +11,21 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import sn2.crafttakestime.config.CraftConfig;
+import sn2.crafttakestime.data.CraftingData;
 import sn2.crafttakestime.network.ProgressPayload;
 import sn2.crafttakestime.server.CraftJobs;
 
 @Mod(CraftTakesTime.MOD_ID)
 public final class CraftTakesTime {
     public static final String MOD_ID = "crafttakestime";
-    public static final CraftConfig CONFIG = CraftConfig.load();
     public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create(Registries.ATTRIBUTE, MOD_ID);
     public static final Holder<Attribute> CRAFTING_SPEED = ATTRIBUTES.register("crafting_speed", () ->
         new RangedAttribute("attribute.crafttakestime.crafting_speed", 1, 0.01, 1024).setSyncable(true));
 
     public CraftTakesTime(IEventBus modBus) {
         ATTRIBUTES.register(modBus);
+        CraftingData.register(modBus);
+        NeoForge.EVENT_BUS.addListener(CraftingData::updated);
         modBus.addListener((EntityAttributeModificationEvent event) -> event.add(EntityTypes.PLAYER, CRAFTING_SPEED));
         modBus.addListener((RegisterPayloadHandlersEvent event) -> event.registrar("1")
             .playToClient(ProgressPayload.TYPE, ProgressPayload.CODEC));
