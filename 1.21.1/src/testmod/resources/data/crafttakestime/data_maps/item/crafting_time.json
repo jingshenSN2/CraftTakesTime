@@ -1,0 +1,10 @@
+{
+  "values": {
+    "#crafttakestime_tests:slow_ingredients": {
+      "ingredient_multiplier": 2
+    },
+    "minecraft:emerald": {
+      "output_multiplier": 3
+    }
+  }
+}

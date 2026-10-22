@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.0-beta.2 — NeoForge — 2026-10-22
+
+Separate builds for Minecraft 1.21.1 and 26.3.
+
+- Configure crafting through native world datapacks and NeoForge Data Maps, including item tags, menu types, namespace multipliers, global settings and sound.
+- Add the persistent `crafttakestime:crafting_time` item component for per-stack ingredient and output timing.
+- Apply changes with `/reload`; cancel existing tasks without consuming ingredients.
+- Keep the player crafting speed attribute and native equipment modifier support.
+- Include a version-specific example datapack and configuration reference.
+
+The previous `config/crafttakestime/craft_time_config.json` is left untouched and is no longer read or generated. Transfer custom values into a datapack using [DATAPACKS.md](DATAPACKS.md).
+
+Validation: 17 custom GameTests pass on each version, including native external-datapack reload, cancellation, timing and component persistence. Each version also passed a real client/integrated-server crafting test using a datapack-provided duration. Third-party menu compatibility and remote multiplayer remain outside the verified scope.
+
 ## 2.0.0-beta.1 — NeoForge — 2026-10-21
 
 Available as separate builds for Minecraft 1.21.1 and 26.3. Install the build matching your game version on both the client and server.

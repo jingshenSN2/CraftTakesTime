@@ -1,0 +1,10 @@
+{
+  "values": {
+    "#minecraft:logs": {
+      "ingredient_multiplier": 0.5
+    },
+    "minecraft:diamond_pickaxe": {
+      "output_multiplier": 3.0
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # 验证记录
 
-日期：2026-10-21（America/Los_Angeles）。模组版本：2.0.0-beta.1。
+日期：2026-10-22（America/Los_Angeles）。模组版本：2.0.0-beta.2。
 
 ## 环境与来源
 
@@ -13,7 +13,7 @@
 
 执行 `./gradlew build runGameTestServer`，结果为 `BUILD SUCCESSFUL`。
 
-测试服务器报告 16 项 required tests 全部通过，其中 **15 项为本工程自定义测试**，另 1 项为 Minecraft 自带测试。
+测试服务器报告 18 项 required tests 全部通过，其中 **17 项为本工程自定义测试**，另 1 项为 Minecraft 自带测试。
 
 自定义测试在实际 Minecraft 菜单、配方和物品组件环境下执行，通过调用玩家 tick 处理器推进任务；它们没有模拟完整鼠标输入或全部网络流量。
 
@@ -30,7 +30,9 @@
 | cursor_capacity | 鼠标只能放下部分产物时不开始制作 |
 | attribute_speed | 原生速度属性 2 倍时等待 10 tick |
 | table_and_bucket_remainders | 真实 3×3 蛋糕配方等待 180 tick，原版返还三个空桶 |
-| ingredient_output_multipliers | 原料物品/模组、产物及菜单倍率共同生效，不乘原料堆叠数量 |
+| ingredient_output_multipliers | 通过原生加载器读取物品、标签和菜单 Data Maps，验证组件覆盖与无效倍率拒绝 |
+| persistent_item_component | 原生保存编解码保留组件，实际制作按组件耗时，组件改变取消任务 |
+| datapack_reload | 加载世界外置数据包、全局/背包/命名空间/音效规则生效、旧任务取消、再次制作使用新耗时、禁用包恢复默认 |
 | anvil_cost_and_rename | 铁砧结果无法提前取出，保留名称并在完成时扣除经验和原料 |
 | smithing_upgrade | 钻石剑升级保留下界合金剑结果，完成时消耗模板、剑和锭 |
 | stonecutter_timed | 切石配方等待后仅消耗一个输入，获得所选配方结果 |
@@ -41,7 +43,7 @@
 
 使用临时测试世界 `CTTValidation`，通过原版 `handleContainerInput` 发送真实容器点击包。客户端与内置服务器间使用 NeoForge payload 注册及实际序列化路径。
 
-测试使用全新的临时存档，等待生存模式同步完成，在开发测试模组中将全局倍率临时设为 3，经验等级设为 0，使一根原木的合成耗时为 60 tick，便于观察进度。该值仅在自动测试运行时设置；默认全局倍率为 1。
+测试使用全新的临时存档，等待生存模式同步完成，通过世界中的标准数据包将全局倍率设为 3，经验等级设为 0，使一根原木的合成耗时为 60 tick，便于观察进度。此倍率由准备脚本创建的临时数据包提供，运行代码没有修改配置对象；默认全局倍率为 1。
 
 已验证：
 

@@ -1,0 +1,8 @@
+{
+  "values": {
+    "minecraft:crafting": 0.5,
+    "minecraft:anvil": 2.0,
+    "minecraft:smithing": 1.0,
+    "minecraft:stonecutter": 1.0
+  }
+}

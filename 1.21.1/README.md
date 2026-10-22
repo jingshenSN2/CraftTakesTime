@@ -1,11 +1,11 @@
 # Craft Takes Time — NeoForge 1.21.1
 
-针对 Minecraft **1.21.1**、NeoForge **21.1.264**、Java **21** 的 Beta 版，版本号 `2.0.0-beta.1`。保留 CraftTakesTime 的耗时规则与音效，由服务端管理制作任务。
+针对 Minecraft **1.21.1**、NeoForge **21.1.264**、Java **21** 的 Beta 版，版本号 `2.0.0-beta.2`。保留 CraftTakesTime 的耗时规则与音效，由服务端管理制作任务。
 
 ## 安装与操作
 
 1. 使用 Minecraft 1.21.1 和 NeoForge 21.1.264。
-2. 将 `build/libs/crafttakestime-neoforge-1.21.1-2.0.0-beta.1.jar` 放入实例的 `mods` 文件夹；联机时客户端和服务端均安装。
+2. 将 `build/libs/crafttakestime-neoforge-1.21.1-2.0.0-beta.2.jar` 放入实例的 `mods` 文件夹；联机时客户端和服务端均安装。
 3. 在背包、工作台、铁砧、锻造台或切石机中准备配方。
 4. 左键或右键点击结果：等待后获得一次完整配方的产物，放到鼠标。
 5. Shift 点击结果：逐次等待，将产物放入背包；原料不足、背包满、配方改变时结束。
@@ -17,51 +17,31 @@
 
 ![背包合成进度](docs/crafting-progress.png)
 
-## 耗时与配置
+## 耗时与数据包
 
-服务端首次运行生成 `config/crafttakestime/craft_time_config.json`，修改后重启服务端（单人游戏重启客户端）。无效配置会记录错误并使用默认值，原文件保留。
+使用标准世界数据包与 NeoForge Data Maps 配置全局、背包、工作台、原料、产物及模组命名空间倍率和音效。数据包放入世界的 `datapacks` 文件夹，启用后执行 `/reload`。默认无需额外数据包即可游玩。
+
+[数据包与物品组件指南](../DATAPACKS.md) 包含完整路径、JSON、优先级和安装步骤。[示例数据包](examples/crafttakestime-settings) 可直接打包使用。
 
 ```text
 所需 ticks = 向上取整(
-  20 × 全局倍率 × 菜单倍率 × 产物物品倍率 × 产物模组倍率
-  × Σ每个非空原料槽(原料物品倍率 × 原料模组倍率)
+  20 × 全局倍率 × 菜单倍率 × 产物倍率 × 产物模组倍率
+  × Σ每个非空原料槽(原料倍率 × 原料模组倍率)
   ÷ (1 + 0.02 × min(200, 经验等级)) ÷ crafting_speed 属性
 )
 ```
 
-原料按占用槽位计算，不按槽里堆叠数量计算。经验加速保持原规则，最高五倍；新属性默认值 1，与经验加成相乘。最短 1 tick；零倍率也在下一个服务端 tick 完成。
+原料按占用槽位计算。经验加速最高五倍；属性默认值为 1；最短耗时为 1 tick。每次制作开始时计算本次耗时。数据包重载会取消当前任务，原料保持原样，再次点击使用新规则。
 
-```json
-{
-  "enableCraftingSound": true,
-  "globalCraftingTimeMultiplier": 1.0,
-  "containerCraftingTimeMultipliers": {
-    "minecraft:inventory": 1.0,
-    "minecraft:crafting": 1.0,
-    "minecraft:anvil": 1.0,
-    "minecraft:smithing": 1.0,
-    "minecraft:stonecutter": 1.0
-  },
-  "ingredientConfig": {
-    "modCraftingTimeMultipliers": {"minecraft": 1.0},
-    "itemCraftingTimeMultipliers": {"minecraft:stick": 1.0}
-  },
-  "outputConfig": {
-    "modCraftingTimeMultipliers": {"minecraft": 1.0},
-    "itemCraftingTimeMultipliers": {"minecraft:stick": 1.0}
-  }
-}
-```
-
-菜单键使用 MenuType 注册 ID；背包使用固定键 `minecraft:inventory`。例如原版工作台的键是 `minecraft:crafting`。旧配置中的 `ingredientConfig`、`outputConfig`、全局倍率及音效开关可对照复制；旧 `containers` 中按 GUI 类名、槽位和贴图坐标描述的部分采用了新结构。
-
-有权限的玩家可使用 Minecraft 属性命令调整基础速度：
+有权限的玩家可调整基础速度：
 
 ```mcfunction
 /attribute @s crafttakestime:crafting_speed base set 2
 ```
 
-此时在原经验加速基础上再加速两倍。命令、物品属性修饰器或其他模组可以复用原生 attribute 系统。每次制作开始时固定本次耗时，后续制作重新计算。
+装备可通过原生属性修饰器提供速度加成。单个物品堆可通过持久化 Data Component `crafttakestime:crafting_time` 覆盖物品默认耗时；物品或标签的默认耗时由数据包提供。
+
+旧 `config/crafttakestime/craft_time_config.json` 保留在磁盘，当前版本使用数据包中的规则。升级时按指南手动迁移需要保留的数值。
 
 ## 实现与扩展
 
@@ -83,7 +63,7 @@
 | [#30 合成速度 attribute](https://github.com/jingshenSN2/CraftTakesTime/issues/30) | 添加 `crafttakestime:crafting_speed`，使用原生属性与修饰器体系。装备和其他模组可通过属性修饰器调整速度。 |
 | [#27 右键 / JEI 绕过](https://github.com/jingshenSN2/CraftTakesTime/issues/27) | 制作规则放到服务端，左右键统一等待，封锁其他原版取出路径。JEI 的配方填充可保留原流程；JEI 兼容性尚未实测。 |
 | [#25 第三方工作台回滚](https://github.com/jingshenSN2/CraftTakesTime/issues/25)、[#19 如何适配](https://github.com/jingshenSN2/CraftTakesTime/issues/19) | 使用菜单语义与适配接口；第三方 Crafting Station 未宣称已兼容。 |
-| [#17 原料与产物倍率无效](https://github.com/jingshenSN2/CraftTakesTime/issues/17) | 按注册 ID 计算服务端倍率，使用真实物品测试原料与产物倍率。 |
+| [#17 原料与产物倍率无效](https://github.com/jingshenSN2/CraftTakesTime/issues/17) | 使用数据包中的物品/标签 Data Maps 与物品堆组件，测试原料、产物及菜单倍率。 |
 | [#18 切石机](https://github.com/jingshenSN2/CraftTakesTime/issues/18) | 增加内置适配器及真实切石配方测试。 |
 | [#28 背包 2×2](https://github.com/jingshenSN2/CraftTakesTime/issues/28) | 内置支持，并有测试覆盖。 |
 | [#20 覆盖层方向](https://github.com/jingshenSN2/CraftTakesTime/issues/20)、[#21 分工作站音效](https://github.com/jingshenSN2/CraftTakesTime/issues/21) | 当前统一结果槽进度条与原音效，保留为后续视觉和音效扩展。 |

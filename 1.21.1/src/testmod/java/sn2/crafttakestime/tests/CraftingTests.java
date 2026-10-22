@@ -18,6 +18,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import sn2.crafttakestime.CraftTakesTime;
 import sn2.crafttakestime.config.CraftTime;
+import sn2.crafttakestime.data.CraftingData;
 import sn2.crafttakestime.server.CraftJobs;
 import java.util.*;
 import java.util.function.Consumer;
@@ -43,6 +44,8 @@ public final class CraftingTests {
         TESTS.put("attribute_speed", CraftingTests::attribute);
         TESTS.put("table_and_bucket_remainders", CraftingTests::remainders);
         TESTS.put("ingredient_output_multipliers", CraftingTests::multipliers);
+        TESTS.put("persistent_item_component", CraftingTests::component);
+        TESTS.put("datapack_reload", DatapackReloadTest::run);
     }
     public CraftingTests(IEventBus bus) {
         bus.addListener((RegisterGameTestsEvent event) -> event.register(CraftingTests.class));
@@ -50,7 +53,7 @@ public final class CraftingTests {
     @GameTestGenerator
     public static Collection<TestFunction> generateTests() {
         return TESTS.entrySet().stream().map(entry -> new TestFunction(ID, entry.getKey(),
-            ID + ":empty", 100, 0, true, entry.getValue())).toList();
+            ID + ":empty", 400, 0, true, entry.getValue())).toList();
     }
     private static void check(boolean value, String message) { if (!value) throw new IllegalStateException(message); }
     private static ServerPlayer player(GameTestHelper h) {
@@ -170,17 +173,38 @@ public final class CraftingTests {
         h.succeed();
     }
     private static void multipliers(GameTestHelper h) {
-        var config = new sn2.crafttakestime.config.CraftConfig();
-        config.ingredientConfig.modCraftingTimeMultipliers.put("minecraft", 0.5);
-        config.ingredientConfig.itemCraftingTimeMultipliers.put("minecraft:oak_planks", 0.5);
-        var inputs = List.of(new ItemStack(Items.OAK_PLANKS, 64), new ItemStack(Items.OAK_PLANKS),
-            new ItemStack(Items.OAK_PLANKS), new ItemStack(Items.OAK_PLANKS));
-        check(config.ticks(inputs, new ItemStack(Items.CRAFTING_TABLE), "minecraft:crafting", 0) == 20,
-            "Ingredient item/mod multipliers multiply; stack count does not affect a recipe");
-        config.outputConfig.itemCraftingTimeMultipliers.put("minecraft:crafting_table", 2.0);
-        config.containerCraftingTimeMultipliers.put("minecraft:crafting", 3.0);
-        check(config.ticks(inputs, new ItemStack(Items.CRAFTING_TABLE), "minecraft:crafting", 0) == 120,
-            "Output and container multipliers apply");
+        var p = player(h);
+        var menu = new GrindstoneMenu(1, p.getInventory());
+        var shard = new ItemStack(Items.AMETHYST_SHARD, 64);
+        var emerald = new ItemStack(Items.EMERALD);
+        check(CraftingData.itemTime(shard).ingredientMultiplier() == 2, "Native item tag data map loaded");
+        check(CraftingData.itemTime(emerald).outputMultiplier() == 3, "Native output item data map loaded");
+        check(CraftingData.ticks(p, menu, List.of(shard), emerald) == 480, "Item, output and menu data maps multiply");
+        shard.set(CraftingData.TIME_COMPONENT.get(), new CraftingData.ItemTime(0.5, 1));
+        check(CraftingData.ticks(p, menu, List.of(shard), emerald) == 120,
+            "Per-stack component overrides item data map; stack count does not affect duration");
+        check(CraftingData.ItemTime.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE,
+            com.google.gson.JsonParser.parseString("{\"ingredient_multiplier\":-1}")).error().isPresent(),
+            "Invalid multiplier rejected by native codec");
+        h.succeed();
+    }
+    private static void component(GameTestHelper h) {
+        var p = player(h); var menu = logs(p, 2);
+        var stack = menu.getSlot(1).getItem();
+        stack.set(CraftingData.TIME_COMPONENT.get(), new CraftingData.ItemTime(1.5, 1));
+        var ops = h.getLevel().registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
+        var encoded = ItemStack.CODEC.encodeStart(ops, stack).getOrThrow();
+        var decoded = ItemStack.CODEC.parse(ops, encoded).getOrThrow();
+        check(ItemStack.matches(stack, decoded), "Per-stack component survives native save codec");
+        menu.clicked(0, 0, ClickType.PICKUP, p); ticks(p, 29);
+        check(menu.getCarried().isEmpty(), "Component controls real crafting job"); ticks(p, 1);
+        check(menu.getCarried().getCount() == 4, "Component finishes at 30 ticks");
+        menu.setCarried(ItemStack.EMPTY);
+        menu.clicked(0, 0, ClickType.PICKUP, p); ticks(p, 5);
+        menu.getSlot(1).getItem().set(CraftingData.TIME_COMPONENT.get(), new CraftingData.ItemTime(2, 1));
+        ticks(p, 50);
+        check(menu.getCarried().isEmpty() && menu.getSlot(1).getItem().getCount() == 1,
+            "Changing input components cancels without consuming materials");
         h.succeed();
     }
     private static void anvil(GameTestHelper h) {
@@ -192,8 +216,8 @@ public final class CraftingTests {
         check(cost > 0, "Rename costs XP");
         check(menu.getSlot(2).tryRemove(1, 64, p).isEmpty(), "Anvil cannot be collected through safeTake bypass");
         menu.clicked(2, 0, ClickType.PICKUP, p);
-        int time = CraftTakesTime.CONFIG.ticks(java.util.List.of(new ItemStack(Items.DIAMOND_SWORD)),
-            menu.getSlot(2).getItem(), "minecraft:anvil", 20);
+        int time = CraftingData.ticks(p, menu, java.util.List.of(new ItemStack(Items.DIAMOND_SWORD)),
+            menu.getSlot(2).getItem());
         ticks(p, time - 1);
         check(menu.getCarried().isEmpty() && p.experienceLevel == 20, "No early output or XP cost"); ticks(p, 1);
         check(menu.getCarried().getHoverName().getString().equals("Timed Sword"), "Rename retained");
